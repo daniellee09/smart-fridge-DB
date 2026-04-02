@@ -1,2 +1,1 @@
-# smart-fridge-DB
-DB 팀프로젝트 
+⚙️ 핵심 구현 로직 (Core Features)1. 유통기한 자동 계산 (BEFORE INSERT Trigger)사용자가 식재료를 등록(add_date)하면, 시스템이 카테고리 마스터 테이블의 default_shelf_life를 참조하여 만료일(expire_date)을 자동으로 산출하여 저장합니다.2. 요리 완료 시 재고 자동 차감 (AFTER INSERT Trigger)사용자가 특정 레시피로 요리를 완료하여 Cook_History에 트랜잭션이 기록되면, DB가 즉시 Recipe_Ingredient에 명시된 요구 수량만큼 My_Fridge의 잔여 수량을 업데이트합니다. 잔여 수량이 0 이하가 되면 자동으로 레코드를 삭제하여 데이터를 정리합니다.👨‍💻 팀원 및 역할 분담 (Team)이름역할담당 업무GitHub팀원1Backend/DBDB 스키마 설계, Trigger/Procedure 작성팀원2BackendAPI API 설계, 비즈니스 로직 구현팀원3Frontend/기획요구사항 명세, 사용자 화면 개발
