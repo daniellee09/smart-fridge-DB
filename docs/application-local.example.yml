@@ -1,0 +1,9 @@
+# application-local.yml 예시
+# 이 파일을 backend/src/main/resources/application-local.yml 로 복사한 뒤 실제 값을 채우세요.
+# application-local.yml은 .gitignore에 등록되어 있으므로 커밋되지 않습니다.
+
+spring:
+  datasource:
+    url: jdbc:mariadb://[손유경이 공유한 호스트]:[포트]/[DB명]
+    username: [손유경이 공유한 사용자명]
+    password: [손유경이 공유한 비밀번호]
