@@ -40,3 +40,6 @@ application-secret.properties
 *.log
 logs/
 Thumbs.db
+
+# Personal work log (not for team sharing)
+WORKLOG.md
