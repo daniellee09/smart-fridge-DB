@@ -48,10 +48,11 @@ CREATE TABLE Recipe (
 );
 
 CREATE TABLE Recipe_Ingredient (
-    ri_id          INT AUTO_INCREMENT PRIMARY KEY,
+    recipe_ingredient_id INT AUTO_INCREMENT PRIMARY KEY,
     recipe_id      INT           NOT NULL,
     ingredient_id  INT           NOT NULL,
     required_qty   DECIMAL(10,2) NOT NULL,
+    unit           VARCHAR(20)   NOT NULL DEFAULT 'g',
     is_essential   BOOLEAN       NOT NULL DEFAULT TRUE,
     FOREIGN KEY (recipe_id) REFERENCES Recipe(recipe_id),
     FOREIGN KEY (ingredient_id) REFERENCES Ingredient_Master(ingredient_id)
