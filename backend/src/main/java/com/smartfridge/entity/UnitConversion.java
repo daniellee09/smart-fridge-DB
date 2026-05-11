@@ -19,9 +19,9 @@ public class UnitConversion {
     @JoinColumn(name = "ingredient_id")
     private IngredientMaster ingredient;
 
-    @Column(name = "input_unit", nullable = false, length = 20)
-    private String inputUnit;
+    @Column(name = "user_unit", nullable = false, length = 20)
+    private String userUnit;
 
-    @Column(name = "converted_qty", nullable = false, precision = 10, scale = 2)
-    private BigDecimal convertedQty;
+    @Column(name = "convert_to_base", nullable = false, precision = 10, scale = 2)
+    private BigDecimal convertToBase;
 }
