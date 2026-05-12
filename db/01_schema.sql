@@ -44,7 +44,8 @@ CREATE TABLE Recipe (
     recipe_id      INT AUTO_INCREMENT PRIMARY KEY,
     recipe_name    VARCHAR(100) NOT NULL,
     difficulty     ENUM('easy', 'medium', 'hard') DEFAULT 'medium',
-    estimated_time INT          NOT NULL
+    estimated_time INT          NOT NULL,
+    description    TEXT         NULL         
 );
 
 CREATE TABLE Recipe_Ingredient (
