@@ -107,41 +107,51 @@ INSERT INTO Recipe (recipe_name, difficulty, estimated_time) VALUES
 ('돼지고기 두부조림', 'medium', 35),
 ('소고기 무국', 'medium', 40);
 
-INSERT INTO Recipe_Ingredient (recipe_id, ingredient_id, required_qty, is_essential) VALUES
-(1, 24, 300, TRUE),
-(1, 16, 200, TRUE),
-(1, 23, 100, FALSE),
-(1, 11, 50, FALSE),
-(2, 18, 600, TRUE),
-(2, 29, 40, TRUE),
-(2, 10, 200, TRUE),
-(2, 11, 50, FALSE),
-(2, 12, 20, FALSE),
-(3, 22, 180, TRUE),
-(3, 11, 30, FALSE),
-(4, 30, 40, TRUE),
-(4, 23, 200, TRUE),
-(4, 10, 100, FALSE),
-(4, 12, 20, FALSE),
-(5, 1, 300, TRUE),
-(5, 12, 10, FALSE),
-(5, 32, 15, FALSE),
-(6, 8, 400, TRUE),
-(6, 33, 30, FALSE),
-(6, 35, 5, FALSE),
-(7, 20, 800, TRUE),
-(7, 8, 200, TRUE),
-(7, 29, 60, TRUE),
-(7, 10, 200, FALSE),
-(8, 28, 150, TRUE),
-(8, 24, 200, TRUE),
-(8, 33, 30, FALSE),
-(9, 17, 300, TRUE),
-(9, 23, 300, TRUE),
-(9, 31, 30, FALSE),
-(10, 15, 200, TRUE),
-(10, 7, 400, TRUE),
-(10, 31, 20, FALSE);
+INSERT INTO Recipe_Ingredient (recipe_id, ingredient_id, required_qty, unit, is_essential) VALUES
+-- 김치찌개
+(1, 24, 300, 'g', TRUE),
+(1, 16, 200, 'g', TRUE),
+(1, 23, 100, 'g', FALSE),
+(1, 11, 50, 'g', FALSE),
+-- 제육볶음
+(2, 18, 600, 'g', TRUE),
+(2, 29, 40, 'g', TRUE),
+(2, 10, 200, 'g', TRUE),
+(2, 11, 50, 'g', FALSE),
+(2, 12, 20, 'g', FALSE),
+-- 계란말이
+(3, 22, 180, 'g', TRUE),
+(3, 11, 30, 'g', FALSE),
+-- 된장찌개
+(4, 30, 40, 'g', TRUE),
+(4, 23, 200, 'g', TRUE),
+(4, 10, 100, 'g', FALSE),
+(4, 12, 20, 'g', FALSE),
+-- 시금치나물
+(5, 1, 300, 'g', TRUE),
+(5, 12, 10, 'g', FALSE),
+(5, 32, 15, 'ml', FALSE),
+-- 감자볶음
+(6, 8, 400, 'g', TRUE),
+(6, 33, 30, 'ml', FALSE),
+(6, 35, 5, 'g', FALSE),
+-- 닭볶음탕
+(7, 20, 800, 'g', TRUE),
+(7, 8, 200, 'g', TRUE),
+(7, 29, 60, 'g', TRUE),
+(7, 10, 200, 'g', FALSE),
+-- 참치김치볶음밥
+(8, 28, 150, 'g', TRUE),
+(8, 24, 200, 'g', TRUE),
+(8, 33, 30, 'ml', FALSE),
+-- 돼지고기 두부조림
+(9, 17, 300, 'g', TRUE),
+(9, 23, 300, 'g', TRUE),
+(9, 31, 30, 'ml', FALSE),
+-- 소고기 무국
+(10, 15, 200, 'g', TRUE),
+(10, 7, 400, 'g', TRUE),
+(10, 31, 20, 'ml', FALSE);
 
 INSERT INTO My_Fridge (ingredient_id, quantity, user_unit, user_quantity, storage_type) VALUES
 (24, 500, '포기', 0.25, '냉장'),

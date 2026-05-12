@@ -31,7 +31,10 @@ BEGIN
     WHERE ri.recipe_id = NEW.recipe_id;
 
     DELETE FROM My_Fridge
-    WHERE quantity <= 0;
+    WHERE quantity <= 0
+        AND ingredient_id IN (
+            SELECT ingredient_id FROM Recipe_Ingredient WHERE recipe_id = 				NEW.recipe_id
+    );
 END$$
 
 DELIMITER ;
