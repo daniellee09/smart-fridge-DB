@@ -26,6 +26,6 @@ public class Category {
     @OneToMany(mappedBy = "parent")
     private List<Category> children = new ArrayList<>();
 
-    @Column(name = "default_expire_days")
-    private Integer defaultExpireDays;
+    @Column(name = "default_days")
+    private Integer defaultDays;
 }

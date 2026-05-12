@@ -19,7 +19,7 @@ public class Recipe {
     @Column(name = "recipe_name", nullable = false, length = 100)
     private String name;
 
-    @Column(name = "difficulty", length = 20)
+    @Column(name = "difficulty", columnDefinition = "ENUM('easy','medium','hard')")
     private String difficulty;
 
     @Column(name = "estimated_time")
