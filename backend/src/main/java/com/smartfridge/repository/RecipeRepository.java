@@ -6,7 +6,7 @@ import org.springframework.data.jpa.repository.Query;
 
 import java.util.List;
 
-public interface RecipeRepository extends JpaRepository<Recipe, Long> {
+public interface RecipeRepository extends JpaRepository<Recipe, Integer> {
 
     // 필수 재료를 100% 보유한 레시피만 반환 (관계대수 디비전)
     @Query(value = """

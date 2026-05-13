@@ -21,7 +21,7 @@ public class CookService {
     private final EntityManager em;
 
     @Transactional
-    public CookHistory cook(Long recipeId) {
+    public CookHistory cook(Integer recipeId) {
         Recipe recipe = recipeRepository.findById(recipeId)
                 .orElseThrow(() -> new NoSuchElementException("레시피를 찾을 수 없습니다. id=" + recipeId));
 
