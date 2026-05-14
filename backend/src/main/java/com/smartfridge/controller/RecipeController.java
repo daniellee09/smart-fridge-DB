@@ -1,12 +1,11 @@
 package com.smartfridge.controller;
 
 import com.smartfridge.common.ApiResponse;
-import com.smartfridge.entity.Recipe;
+import com.smartfridge.dto.RecipeDetailResponse;
+import com.smartfridge.dto.RecipeSummaryResponse;
 import com.smartfridge.service.RecipeService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -18,12 +17,17 @@ public class RecipeController {
     private final RecipeService recipeService;
 
     @GetMapping
-    public ApiResponse<List<Recipe>> getAll() {
+    public ApiResponse<List<RecipeSummaryResponse>> getAll() {
         return ApiResponse.ok(recipeService.getAll());
     }
 
     @GetMapping("/recommend")
-    public ApiResponse<List<Recipe>> getRecommended() {
+    public ApiResponse<List<RecipeSummaryResponse>> getRecommended() {
         return ApiResponse.ok(recipeService.getRecommended());
+    }
+
+    @GetMapping("/{id}")
+    public ApiResponse<RecipeDetailResponse> getDetail(@PathVariable Integer id) {
+        return ApiResponse.ok(recipeService.getDetail(id));
     }
 }

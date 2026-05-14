@@ -1,5 +1,6 @@
 package com.smartfridge.service;
 
+import com.smartfridge.dto.CookHistoryResponse;
 import com.smartfridge.entity.CookHistory;
 import com.smartfridge.entity.Recipe;
 import com.smartfridge.repository.CookHistoryRepository;
@@ -21,23 +22,26 @@ public class CookService {
     private final EntityManager em;
 
     @Transactional
-    public CookHistory cook(Integer recipeId) {
+    public CookHistoryResponse cook(Integer recipeId) {
         Recipe recipe = recipeRepository.findById(recipeId)
                 .orElseThrow(() -> new NoSuchElementException("레시피를 찾을 수 없습니다. id=" + recipeId));
 
         CookHistory history = CookHistory.of(recipe);
         cookHistoryRepository.save(history);
 
-        // AFTER INSERT 트리거(trg_auto_stock_reduce)가 My_Fridge를 수정했으므로
-        // JPA 캐시를 비워야 이후 조회 시 정확한 재고가 반환됨
         em.flush();
+        // 트리거가 수정한 My_Fridge를 이후 조회 시 정확히 반환하도록 캐시 비움
+        // DTO 변환을 clear() 전에 수행해야 lazy 필드(recipe) 접근 가능
+        CookHistoryResponse response = CookHistoryResponse.from(history);
         em.clear();
 
-        return history;
+        return response;
     }
 
     @Transactional(readOnly = true)
-    public List<CookHistory> getHistory() {
-        return cookHistoryRepository.findAllByOrderByCookedAtDesc();
+    public List<CookHistoryResponse> getHistory() {
+        return cookHistoryRepository.findAllByOrderByCookedAtDesc().stream()
+                .map(CookHistoryResponse::from)
+                .toList();
     }
 }
