@@ -16,7 +16,7 @@ public class CookController {
     private final CookService cookService;
 
     @PostMapping("/{recipeId}")
-    public ApiResponse<CookHistory> cook(@PathVariable Long recipeId) {
+    public ApiResponse<CookHistory> cook(@PathVariable Integer recipeId) {
         return ApiResponse.ok(cookService.cook(recipeId), "요리가 완료되었습니다.");
     }
 

@@ -13,7 +13,7 @@ public class CookHistory {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "history_id")
-    private Long id;
+    private Integer id;
 
     // AFTER INSERT 트리거(trg_auto_stock_reduce)가 재고 자동 차감
     @ManyToOne(fetch = FetchType.LAZY)
