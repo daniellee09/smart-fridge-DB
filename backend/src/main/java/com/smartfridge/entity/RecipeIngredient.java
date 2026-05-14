@@ -1,6 +1,5 @@
 package com.smartfridge.entity;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.Getter;
 
@@ -16,8 +15,6 @@ public class RecipeIngredient {
     @Column(name = "recipe_ingredient_id")
     private Integer id;
 
-    // JSON 직렬화 시 Recipe → ingredients → recipe 순환 참조 방지
-    @JsonIgnore
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "recipe_id", nullable = false)
     private Recipe recipe;
