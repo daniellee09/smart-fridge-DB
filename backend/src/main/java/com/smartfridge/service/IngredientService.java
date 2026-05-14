@@ -15,7 +15,7 @@ public class IngredientService {
 
     @Transactional(readOnly = true)
     public List<IngredientResponse> search(String keyword) {
-        return ingredientRepository.findByIngredientNameContaining(keyword)
+        return ingredientRepository.findByNameContaining(keyword)
                 .stream()
                 .map(IngredientResponse::from)
                 .toList();

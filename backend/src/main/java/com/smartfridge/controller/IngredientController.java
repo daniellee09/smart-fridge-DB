@@ -20,12 +20,12 @@ public class IngredientController {
     @GetMapping
     public ApiResponse<List<IngredientResponse>> search(
             @RequestParam String keyword) {
-        return ApiResponse.success(ingredientService.search(keyword));
+        return ApiResponse.ok(ingredientService.search(keyword));
     }
 
     @GetMapping("/{id}/units")
     public ApiResponse<List<UnitConversionResponse>> getUnits(
             @PathVariable Integer id) {
-        return ApiResponse.success(unitConversionService.getUnits(id));
+        return ApiResponse.ok(unitConversionService.getUnits(id));
     }
 }

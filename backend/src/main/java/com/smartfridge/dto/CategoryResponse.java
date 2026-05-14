@@ -11,7 +11,7 @@ public record CategoryResponse(
     public static CategoryResponse from(Category c) {
         return new CategoryResponse(
                 c.getId(),
-                c.getCategoryName(),
+                c.getName(),
                 c.getParent() != null ? c.getParent().getId() : null,
                 c.getDefaultDays()
         );

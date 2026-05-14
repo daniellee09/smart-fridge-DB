@@ -17,18 +17,18 @@ public class MyFridgeController {
 
     @GetMapping
     public ApiResponse<List<MyFridgeResponse>> getAll() {
-        return ApiResponse.success(myFridgeService.getAll());
+        return ApiResponse.ok(myFridgeService.getAll());
     }
 
     @PostMapping
     public ApiResponse<MyFridgeResponse> add(
             @RequestBody MyFridgeCreateRequest request) {
-        return ApiResponse.success(myFridgeService.add(request));
+        return ApiResponse.ok(myFridgeService.add(request));
     }
 
     @DeleteMapping("/{id}")
     public ApiResponse<Void> delete(@PathVariable Integer id) {
         myFridgeService.delete(id);
-        return ApiResponse.success(null);
+        return ApiResponse.ok(null);
     }
 }

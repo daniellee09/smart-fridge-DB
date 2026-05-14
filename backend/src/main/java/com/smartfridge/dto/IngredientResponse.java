@@ -11,8 +11,8 @@ public record IngredientResponse(
     public static IngredientResponse from(IngredientMaster im) {
         return new IngredientResponse(
                 im.getId(),
-                im.getIngredientName(),
-                im.getCategory().getCategoryName(),
+                im.getName(),
+                im.getCategory().getName(),
                 im.getBaseUnit()
         );
     }

@@ -19,7 +19,7 @@ public record MyFridgeResponse(
         return new MyFridgeResponse(
                 f.getId(),
                 f.getIngredient().getId(),
-                f.getIngredient().getIngredientName(),
+                f.getIngredient().getName(),
                 f.getQuantity(),
                 f.getUserUnit(),
                 f.getUserQuantity(),

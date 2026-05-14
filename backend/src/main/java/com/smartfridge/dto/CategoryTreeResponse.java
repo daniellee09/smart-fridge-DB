@@ -12,7 +12,7 @@ public record CategoryTreeResponse(
     public static CategoryTreeResponse from(Category c) {
         return new CategoryTreeResponse(
                 c.getId(),
-                c.getCategoryName(),
+                c.getName(),
                 c.getDefaultDays(),
                 c.getChildren().stream()
                         .map(CategoryTreeResponse::from)

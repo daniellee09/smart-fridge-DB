@@ -16,6 +16,6 @@ public class CategoryController {
 
     @GetMapping
     public ApiResponse<List<CategoryTreeResponse>> getTree() {
-        return ApiResponse.success(categoryService.getTree());
+        return ApiResponse.ok(categoryService.getTree());
     }
 }
