@@ -1,7 +1,7 @@
 package com.smartfridge.controller;
 
 import com.smartfridge.common.ApiResponse;
-import com.smartfridge.entity.CookHistory;
+import com.smartfridge.dto.CookHistoryResponse;
 import com.smartfridge.service.CookService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
@@ -16,12 +16,12 @@ public class CookController {
     private final CookService cookService;
 
     @PostMapping("/{recipeId}")
-    public ApiResponse<CookHistory> cook(@PathVariable Integer recipeId) {
+    public ApiResponse<CookHistoryResponse> cook(@PathVariable Integer recipeId) {
         return ApiResponse.ok(cookService.cook(recipeId), "요리가 완료되었습니다.");
     }
 
     @GetMapping("/history")
-    public ApiResponse<List<CookHistory>> getHistory() {
+    public ApiResponse<List<CookHistoryResponse>> getHistory() {
         return ApiResponse.ok(cookService.getHistory());
     }
 }
