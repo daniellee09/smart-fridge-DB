@@ -1,5 +1,6 @@
 package com.smartfridge.repository;
 
+import com.smartfridge.dto.RecipeSummaryProjection;
 import com.smartfridge.entity.Recipe;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -21,7 +22,7 @@ public interface RecipeRepository extends JpaRepository<Recipe, Integer> {
             GROUP BY r.recipe_id, r.recipe_name, r.difficulty, r.estimated_time, r.description
             HAVING COUNT(f.fridge_item_id) = COUNT(ri.ingredient_id)
             """, nativeQuery = true)
-    List<Recipe> findRecommended();
+    List<RecipeSummaryProjection> findRecommended();
 
     @Query("SELECT DISTINCT r FROM Recipe r " +
            "LEFT JOIN FETCH r.ingredients ri " +

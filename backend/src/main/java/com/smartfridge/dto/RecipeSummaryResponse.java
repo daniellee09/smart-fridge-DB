@@ -18,4 +18,14 @@ public record RecipeSummaryResponse(
                 r.getDescription()
         );
     }
+
+    public static RecipeSummaryResponse from(RecipeSummaryProjection p) {
+        return new RecipeSummaryResponse(
+                p.getRecipeId(),
+                p.getRecipeName(),
+                p.getDifficulty(),
+                p.getEstimatedTime(),
+                p.getDescription()
+        );
+    }
 }
