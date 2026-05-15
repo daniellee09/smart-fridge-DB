@@ -7,7 +7,14 @@ const getRecipesByCategory = (category, ingredientName) => {
                 name: `${ingredientName} 김치찌개`,
                 time: '30분',
                 servings: '2-3인분',
-                ingredients: [ingredientName, '김치', '두부', '대파', '고추가루', '마늘'],
+                ingredients: [
+                    { name: ingredientName, qty: 200 },
+                    { name: '김치', qty: 300 },
+                    { name: '두부', qty: 100 },
+                    { name: '대파', qty: 50 },
+                    { name: '고추가루', qty: 10 },
+                    { name: '마늘', qty: 10 },
+                ],
                 steps: [
                     '김치를 먹기 좋은 크기로 썰어주세요.',
                     `${ingredientName}을(를) 한입 크기로 썰어주세요.`,
@@ -20,7 +27,15 @@ const getRecipesByCategory = (category, ingredientName) => {
                 name: `${ingredientName} 볶음`,
                 time: '20분',
                 servings: '2인분',
-                ingredients: [ingredientName, '양파', '당근', '피망', '간장', '설탕', '참기름'],
+                ingredients: [
+                    { name: ingredientName, qty: 300 },
+                    { name: '양파', qty: 100 },
+                    { name: '당근', qty: 50 },
+                    { name: '피망', qty: 50 },
+                    { name: '간장', qty: 20 },
+                    { name: '설탕', qty: 10 },
+                    { name: '참기름', qty: 5 },
+                ],
                 steps: [
                     `${ingredientName}과 야채를 먹기 좋게 썰어주세요.`,
                     '팬에 기름을 두르고 고기를 먼저 볶아주세요.',
@@ -34,24 +49,19 @@ const getRecipesByCategory = (category, ingredientName) => {
                 name: `${ingredientName} 무침`,
                 time: '15분',
                 servings: '2-3인분',
-                ingredients: [ingredientName, '고추가루', '마늘', '참기름', '깨소금', '간장'],
+                ingredients: [
+                    { name: ingredientName, qty: 200 },
+                    { name: '고추가루', qty: 10 },
+                    { name: '마늘', qty: 10 },
+                    { name: '참기름', qty: 5 },
+                    { name: '깨소금', qty: 5 },
+                    { name: '간장', qty: 15 },
+                ],
                 steps: [
                     `${ingredientName}을(를) 깨끗이 씻어주세요.`,
                     '먹기 좋은 크기로 썰어주세요.',
                     '고추가루, 마늘, 참기름, 깨소금을 넣고 무쳐주세요.',
                     '간장으로 간을 맞추면 완성!',
-                ],
-            },
-            {
-                name: `${ingredientName} 샐러드`,
-                time: '10분',
-                servings: '2인분',
-                ingredients: [ingredientName, '양상추', '토마토', '올리브유', '발사믹', '소금'],
-                steps: [
-                    '모든 채소를 깨끗이 씻어주세요.',
-                    '먹기 좋은 크기로 썰어 그릇에 담아주세요.',
-                    '올리브유와 발사믹을 섞어 드레싱을 만들어주세요.',
-                    '소금으로 간을 맞춰 완성!',
                 ],
             },
         ],
@@ -60,7 +70,12 @@ const getRecipesByCategory = (category, ingredientName) => {
                 name: `${ingredientName} 스무디`,
                 time: '5분',
                 servings: '1-2인분',
-                ingredients: [ingredientName, '요거트', '우유', '꿀', '얼음'],
+                ingredients: [
+                    { name: ingredientName, qty: 200 },
+                    { name: '요거트', qty: 100 },
+                    { name: '우유', qty: 100 },
+                    { name: '꿀', qty: 10 },
+                ],
                 steps: [
                     `${ingredientName}을(를) 씻고 적당한 크기로 잘라주세요.`,
                     '믹서기에 모든 재료를 넣어주세요.',
@@ -74,7 +89,13 @@ const getRecipesByCategory = (category, ingredientName) => {
                 name: `${ingredientName} 스크램블`,
                 time: '10분',
                 servings: '1-2인분',
-                ingredients: [ingredientName, '계란', '버터', '소금', '후추', '파슬리'],
+                ingredients: [
+                    { name: ingredientName, qty: 100 },
+                    { name: '계란', qty: 100 },
+                    { name: '버터', qty: 10 },
+                    { name: '소금', qty: 5 },
+                    { name: '후추', qty: 2 },
+                ],
                 steps: [
                     '계란을 풀어주세요.',
                     `${ingredientName}과(와) 소금, 후추를 넣고 섞어주세요.`,
@@ -88,7 +109,14 @@ const getRecipesByCategory = (category, ingredientName) => {
                 name: `${ingredientName} 구이`,
                 time: '25분',
                 servings: '2-3인분',
-                ingredients: [ingredientName, '소금', '후추', '레몬', '올리브유', '마늘'],
+                ingredients: [
+                    { name: ingredientName, qty: 300 },
+                    { name: '소금', qty: 5 },
+                    { name: '후추', qty: 2 },
+                    { name: '레몬', qty: 30 },
+                    { name: '올리브유', qty: 15 },
+                    { name: '마늘', qty: 10 },
+                ],
                 steps: [
                     `${ingredientName}을(를) 깨끗이 손질해주세요.`,
                     '소금, 후추, 다진 마늘로 밑간을 해주세요.',
@@ -102,7 +130,11 @@ const getRecipesByCategory = (category, ingredientName) => {
                 name: `${ingredientName} 밥`,
                 time: '40분',
                 servings: '3-4인분',
-                ingredients: [ingredientName, '물', '소금'],
+                ingredients: [
+                    { name: ingredientName, qty: 300 },
+                    { name: '물', qty: 400 },
+                    { name: '소금', qty: 3 },
+                ],
                 steps: [
                     `${ingredientName}을(를) 깨끗이 씻어주세요.`,
                     '30분 정도 불려주세요.',
@@ -116,7 +148,13 @@ const getRecipesByCategory = (category, ingredientName) => {
                 name: `${ingredientName} 활용 양념장`,
                 time: '5분',
                 servings: '여러 번',
-                ingredients: [ingredientName, '간장', '설탕', '참기름', '마늘', '깨소금'],
+                ingredients: [
+                    { name: ingredientName, qty: 30 },
+                    { name: '간장', qty: 20 },
+                    { name: '설탕', qty: 10 },
+                    { name: '참기름', qty: 5 },
+                    { name: '마늘', qty: 10 },
+                ],
                 steps: [
                     '모든 재료를 그릇에 담아주세요.',
                     `${ingredientName}을(를) 적당량 넣어주세요.`,
@@ -132,7 +170,11 @@ const getRecipesByCategory = (category, ingredientName) => {
             name: `${ingredientName} 요리`,
             time: '20분',
             servings: '2인분',
-            ingredients: [ingredientName, '소금', '후추', '기름'],
+            ingredients: [
+                { name: ingredientName, qty: 100 },
+                { name: '소금', qty: 5 },
+                { name: '후추', qty: 2 },
+            ],
             steps: [
                 `${ingredientName}을(를) 손질해주세요.`,
                 '적당한 조리법으로 요리해주세요.',
@@ -143,10 +185,15 @@ const getRecipesByCategory = (category, ingredientName) => {
     ];
 };
 
-export function RecipeModal({ isOpen, onClose, ingredient }) {
+export function RecipeModal({ isOpen, onClose, ingredient, onCook }) {
     if (!isOpen) return null;
 
     const recipes = getRecipesByCategory(ingredient.category, ingredient.name);
+
+    const handleCook = (recipe) => {
+        onCook(recipe.ingredients);
+        onClose();
+    };
 
     return (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50">
@@ -167,7 +214,7 @@ export function RecipeModal({ isOpen, onClose, ingredient }) {
                 <div className="flex-1 overflow-y-auto p-6">
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                         {recipes.map((recipe, index) => (
-                            <div key={index} className="bg-white border-2 border-gray-200 rounded-xl p-5 hover:border-blue-300 hover:shadow-lg transition-all">
+                            <div key={index} className="bg-white border-2 border-gray-200 rounded-xl p-5 hover:border-blue-300 hover:shadow-lg transition-all flex flex-col">
                                 <h3 className="text-xl font-bold text-gray-900 mb-3">{recipe.name}</h3>
                                 <div className="flex items-center gap-4 mb-4 text-sm text-gray-600">
                                     <div className="flex items-center gap-1">
@@ -184,16 +231,16 @@ export function RecipeModal({ isOpen, onClose, ingredient }) {
                                     <div className="flex flex-wrap gap-2">
                                         {recipe.ingredients.map((ing, idx) => (
                                             <span key={idx} className={`px-3 py-1 rounded-full text-xs ${
-                                                ing === ingredient.name
+                                                ing.name === ingredient.name
                                                     ? 'bg-blue-100 text-blue-700 font-semibold'
                                                     : 'bg-gray-100 text-gray-700'
                                             }`}>
-                        {ing}
+                        {ing.name} {ing.qty}g
                       </span>
                                         ))}
                                     </div>
                                 </div>
-                                <div>
+                                <div className="flex-1">
                                     <h4 className="font-semibold text-gray-800 mb-2 text-sm">조리 순서:</h4>
                                     <ol className="space-y-1.5">
                                         {recipe.steps.map((step, idx) => (
@@ -204,6 +251,15 @@ export function RecipeModal({ isOpen, onClose, ingredient }) {
                                         ))}
                                     </ol>
                                 </div>
+
+                                {/* 요리 완료 버튼 */}
+                                <button
+                                    onClick={() => handleCook(recipe)}
+                                    className="mt-4 w-full py-3 bg-green-500 hover:bg-green-600 text-white font-semibold rounded-xl transition-colors flex items-center justify-center gap-2"
+                                >
+                                    <ChefHat className="w-5 h-5" />
+                                    요리 완료
+                                </button>
                             </div>
                         ))}
                     </div>

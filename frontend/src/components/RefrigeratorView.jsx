@@ -102,7 +102,7 @@ const IngredientItem = ({ ingredient, onClick, onDelete }) => {
     );
 };
 
-export function RefrigeratorView({ingredients, onDelete}) {
+export function RefrigeratorView({ingredients, onDelete, onCook}) {
     const [selectedIngredient, setSelectedIngredient] = useState(null);
     const [isRecipeModalOpen, setIsRecipeModalOpen] = useState(false);
 
@@ -163,6 +163,7 @@ export function RefrigeratorView({ingredients, onDelete}) {
                     isOpen={isRecipeModalOpen}
                     onClose={handleRecipeModalClose}
                     ingredient={selectedIngredient}
+                    onCook={onCook}
                 />
             )}
         </div>

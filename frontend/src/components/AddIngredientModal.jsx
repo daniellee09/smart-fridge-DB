@@ -1,10 +1,35 @@
 import { useState } from 'react';
-import { X, Calendar, Snowflake, Droplet, Cloud } from 'lucide-react';
+import { X, Calendar, Snowflake, Droplet, Cloud, Search } from 'lucide-react';
+
+// 백엔드 연동 전 Mock 식재료 데이터
+const MOCK_INGREDIENTS = [
+    { id: 1, name: '돼지고기 삼겹살', category: '육류', defaultShelfLife: 3 },
+    { id: 2, name: '돼지고기 목살', category: '육류', defaultShelfLife: 3 },
+    { id: 3, name: '소고기 등심', category: '육류', defaultShelfLife: 3 },
+    { id: 4, name: '닭가슴살', category: '육류', defaultShelfLife: 3 },
+    { id: 5, name: '김치', category: '채소', defaultShelfLife: 30 },
+    { id: 6, name: '양파', category: '채소', defaultShelfLife: 14 },
+    { id: 7, name: '대파', category: '채소', defaultShelfLife: 7 },
+    { id: 8, name: '당근', category: '채소', defaultShelfLife: 14 },
+    { id: 9, name: '두부', category: '유제품', defaultShelfLife: 5 },
+    { id: 10, name: '계란', category: '유제품', defaultShelfLife: 14 },
+    { id: 11, name: '우유', category: '유제품', defaultShelfLife: 7 },
+    { id: 12, name: '사과', category: '과일', defaultShelfLife: 14 },
+    { id: 13, name: '바나나', category: '과일', defaultShelfLife: 5 },
+    { id: 14, name: '고등어', category: '해산물', defaultShelfLife: 2 },
+    { id: 15, name: '새우', category: '해산물', defaultShelfLife: 2 },
+    { id: 16, name: '쌀', category: '곡물', defaultShelfLife: 365 },
+    { id: 17, name: '간장', category: '조미료', defaultShelfLife: 365 },
+    { id: 18, name: '설탕', category: '조미료', defaultShelfLife: 365 },
+    { id: 19, name: '참기름', category: '조미료', defaultShelfLife: 180 },
+    { id: 20, name: '마늘', category: '채소', defaultShelfLife: 14 },
+];
 
 export function AddIngredientModal({ isOpen, onClose, onSubmit }) {
+    const [keyword, setKeyword] = useState('');
+    const [selectedIngredient, setSelectedIngredient] = useState(null);
+    const [showDropdown, setShowDropdown] = useState(false);
     const [formData, setFormData] = useState({
-        name: '',
-        category: '',
         quantity: '',
         unit: 'g',
         storageMethod: 'refrigerated',
@@ -12,16 +37,55 @@ export function AddIngredientModal({ isOpen, onClose, onSubmit }) {
         expiryDate: '',
     });
 
+    // 검색 필터링
+    const filtered = keyword.length > 0
+        ? MOCK_INGREDIENTS.filter((i) => i.name.includes(keyword))
+        : [];
+
+    // 구매일 입력 시 유통기한 자동 계산
+    const handlePurchaseDateChange = (date) => {
+        setFormData((prev) => {
+            if (selectedIngredient && date) {
+                const purchase = new Date(date);
+                purchase.setDate(purchase.getDate() + selectedIngredient.defaultShelfLife);
+                const expiry = purchase.toISOString().split('T')[0];
+                return { ...prev, purchaseDate: date, expiryDate: expiry };
+            }
+            return { ...prev, purchaseDate: date };
+        });
+    };
+
+    const handleSelect = (ingredient) => {
+        setSelectedIngredient(ingredient);
+        setKeyword(ingredient.name);
+        setShowDropdown(false);
+
+        // 선택 후 구매일 있으면 유통기한 재계산
+        if (formData.purchaseDate) {
+            handlePurchaseDateChange(formData.purchaseDate);
+        }
+    };
+
     const handleSubmit = (e) => {
         e.preventDefault();
-        onSubmit(formData);
-        onClose();
+        if (!selectedIngredient) return;
+        onSubmit({
+            name: selectedIngredient.name,
+            category: selectedIngredient.category,
+            quantity: formData.quantity,
+            unit: formData.unit,
+            storageMethod: formData.storageMethod,
+            purchaseDate: formData.purchaseDate,
+            expiryDate: formData.expiryDate,
+        });
+        handleCancel();
     };
 
     const handleCancel = () => {
+        setKeyword('');
+        setSelectedIngredient(null);
+        setShowDropdown(false);
         setFormData({
-            name: '',
-            category: '',
             quantity: '',
             unit: 'g',
             storageMethod: 'refrigerated',
@@ -46,41 +110,50 @@ export function AddIngredientModal({ isOpen, onClose, onSubmit }) {
                 <form onSubmit={handleSubmit}>
                     <div className="p-6">
                         <div className="grid grid-cols-2 gap-8">
+
+                            {/* 왼쪽 - 기본 정보 */}
                             <div className="space-y-5">
                                 <h3 className="text-lg font-semibold text-gray-700 mb-4">기본 정보</h3>
 
-                                <div>
-                                    <label className="block text-sm font-medium text-gray-700 mb-2">식재료명</label>
-                                    <input
-                                        type="text"
-                                        value={formData.name}
-                                        onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                                        placeholder="예: 삼겹살"
-                                        className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all"
-                                        required
-                                    />
+                                {/* 식재료 검색 */}
+                                <div className="relative">
+                                    <label className="block text-sm font-medium text-gray-700 mb-2">식재료 검색</label>
+                                    <div className="relative">
+                                        <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+                                        <input
+                                            type="text"
+                                            value={keyword}
+                                            onChange={(e) => {
+                                                setKeyword(e.target.value);
+                                                setSelectedIngredient(null);
+                                                setShowDropdown(true);
+                                            }}
+                                            onFocus={() => setShowDropdown(true)}
+                                            placeholder="예: 삼겹살"
+                                            className="w-full pl-9 pr-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all"
+                                            required
+                                        />
+                                    </div>
+
+                                    {/* 드롭다운 */}
+                                    {showDropdown && filtered.length > 0 && (
+                                        <div className="absolute z-10 w-full mt-1 bg-white border border-gray-200 rounded-lg shadow-lg max-h-48 overflow-y-auto">
+                                            {filtered.map((item) => (
+                                                <button
+                                                    key={item.id}
+                                                    type="button"
+                                                    onClick={() => handleSelect(item)}
+                                                    className="w-full flex items-center justify-between px-4 py-2.5 hover:bg-blue-50 transition-colors text-left"
+                                                >
+                                                    <span className="text-sm font-medium text-gray-800">{item.name}</span>
+                                                    <span className="text-xs text-gray-400 bg-gray-100 px-2 py-0.5 rounded-full">{item.category}</span>
+                                                </button>
+                                            ))}
+                                        </div>
+                                    )}
                                 </div>
 
-                                <div>
-                                    <label className="block text-sm font-medium text-gray-700 mb-2">카테고리</label>
-                                    <select
-                                        value={formData.category}
-                                        onChange={(e) => setFormData({ ...formData, category: e.target.value })}
-                                        className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all bg-white"
-                                        required
-                                    >
-                                        <option value="">선택해주세요</option>
-                                        <option value="육류">육류</option>
-                                        <option value="채소">채소</option>
-                                        <option value="과일">과일</option>
-                                        <option value="유제품">유제품</option>
-                                        <option value="해산물">해산물</option>
-                                        <option value="곡물">곡물</option>
-                                        <option value="조미료">조미료</option>
-                                        <option value="기타">기타</option>
-                                    </select>
-                                </div>
-
+                                {/* 수량/단위 */}
                                 <div>
                                     <label className="block text-sm font-medium text-gray-700 mb-2">수량 / 단위</label>
                                     <div className="flex gap-3">
@@ -108,9 +181,11 @@ export function AddIngredientModal({ isOpen, onClose, onSubmit }) {
                                 </div>
                             </div>
 
+                            {/* 오른쪽 - 보관 정보 */}
                             <div className="space-y-5">
                                 <h3 className="text-lg font-semibold text-gray-700 mb-4">보관 정보</h3>
 
+                                {/* 보관 방식 */}
                                 <div>
                                     <label className="block text-sm font-medium text-gray-700 mb-3">보관 방식</label>
                                     <div className="grid grid-cols-3 gap-3">
@@ -138,13 +213,14 @@ export function AddIngredientModal({ isOpen, onClose, onSubmit }) {
                                     </div>
                                 </div>
 
+                                {/* 구매일 */}
                                 <div>
                                     <label className="block text-sm font-medium text-gray-700 mb-2">구매일</label>
                                     <div className="relative">
                                         <input
                                             type="date"
                                             value={formData.purchaseDate}
-                                            onChange={(e) => setFormData({ ...formData, purchaseDate: e.target.value })}
+                                            onChange={(e) => handlePurchaseDateChange(e.target.value)}
                                             className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all"
                                             required
                                         />
@@ -152,18 +228,26 @@ export function AddIngredientModal({ isOpen, onClose, onSubmit }) {
                                     </div>
                                 </div>
 
+                                {/* 유통기한 (자동 계산, 읽기 전용) */}
                                 <div>
-                                    <label className="block text-sm font-medium text-gray-700 mb-2">유통기한</label>
+                                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                                        유통기한
+                                        <span className="ml-2 text-xs text-blue-500">(구매일 기준 자동 계산)</span>
+                                    </label>
                                     <div className="relative">
                                         <input
                                             type="date"
                                             value={formData.expiryDate}
-                                            onChange={(e) => setFormData({ ...formData, expiryDate: e.target.value })}
-                                            className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all"
-                                            required
+                                            readOnly
+                                            className="w-full px-4 py-2.5 border border-gray-200 rounded-lg bg-gray-50 text-gray-600 cursor-not-allowed outline-none"
                                         />
                                         <Calendar className="absolute right-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400 pointer-events-none" />
                                     </div>
+                                    {selectedIngredient && (
+                                        <p className="text-xs text-gray-400 mt-1">
+                                            기본 유통기한: {selectedIngredient.defaultShelfLife}일
+                                        </p>
+                                    )}
                                 </div>
                             </div>
                         </div>
@@ -173,7 +257,15 @@ export function AddIngredientModal({ isOpen, onClose, onSubmit }) {
                         <button type="button" onClick={handleCancel} className="px-5 py-2.5 text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors font-medium">
                             취소
                         </button>
-                        <button type="submit" className="px-5 py-2.5 text-white bg-blue-600 rounded-lg hover:bg-blue-700 transition-colors font-medium shadow-sm">
+                        <button
+                            type="submit"
+                            disabled={!selectedIngredient}
+                            className={`px-5 py-2.5 text-white rounded-lg transition-colors font-medium shadow-sm ${
+                                selectedIngredient
+                                    ? 'bg-blue-600 hover:bg-blue-700'
+                                    : 'bg-gray-300 cursor-not-allowed'
+                            }`}
+                        >
                             등록하기
                         </button>
                     </div>
