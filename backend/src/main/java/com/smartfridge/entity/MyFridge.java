@@ -1,7 +1,9 @@
 package com.smartfridge.entity;
 
 import jakarta.persistence.*;
+import lombok.AccessLevel;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -9,6 +11,7 @@ import java.time.LocalDate;
 @Entity
 @Table(name = "My_Fridge")
 @Getter
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class MyFridge {
 
     @Id
@@ -38,4 +41,15 @@ public class MyFridge {
     // BEFORE INSERT 트리거(trg_auto_expire_date)가 자동으로 채워줌
     @Column(name = "expire_date")
     private LocalDate expireDate;
+
+    public MyFridge(IngredientMaster ingredient, BigDecimal quantity,
+                    String userUnit, BigDecimal userQuantity,
+                    String storageType, LocalDate addDate) {
+        this.ingredient = ingredient;
+        this.quantity = quantity;
+        this.userUnit = userUnit;
+        this.userQuantity = userQuantity;
+        this.storageType = storageType;
+        this.addDate = addDate;
+    }
 }
