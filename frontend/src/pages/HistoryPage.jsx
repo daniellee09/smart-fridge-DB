@@ -1,40 +1,21 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { ChefHat, Clock, Calendar } from 'lucide-react';
-
-// 백엔드 연동 전 Mock 이력 데이터
-const MOCK_HISTORY = [
-    {
-        historyId: 1,
-        recipeName: '김치찌개',
-        cookedAt: '2026-05-14T19:30:00',
-        deductedIngredients: [
-            { name: '돼지고기 삼겹살', deducted: 200, unit: 'g' },
-            { name: '김치', deducted: 300, unit: 'g' },
-            { name: '두부', deducted: 100, unit: 'g' },
-        ],
-    },
-    {
-        historyId: 2,
-        recipeName: '계란말이',
-        cookedAt: '2026-05-13T12:00:00',
-        deductedIngredients: [
-            { name: '계란', deducted: 3, unit: '개' },
-            { name: '대파', deducted: 20, unit: 'g' },
-        ],
-    },
-    {
-        historyId: 3,
-        recipeName: '제육볶음',
-        cookedAt: '2026-05-12T18:00:00',
-        deductedIngredients: [
-            { name: '돼지고기 목살', deducted: 300, unit: 'g' },
-            { name: '양파', deducted: 100, unit: 'g' },
-        ],
-    },
-];
+import { getCookHistory } from '../api/history';
 
 export default function HistoryPage() {
-    const [history] = useState(MOCK_HISTORY);
+    const [history, setHistory] = useState([]);
+
+    useEffect(() => {
+        const fetchHistory = async () => {
+            try {
+                const data = await getCookHistory();
+                setHistory(data);
+            } catch (err) {
+                console.error('요리 이력 불러오기 실패:', err);
+            }
+        };
+        fetchHistory();
+    }, []);
 
     return (
         <div className="min-h-screen bg-gradient-to-br from-gray-100 via-gray-50 to-white p-8">
@@ -50,7 +31,7 @@ export default function HistoryPage() {
                     <div className="space-y-4">
                         {history.map((item) => (
                             <div
-                                key={item.historyId}
+                                key={item.id}
                                 className="bg-white rounded-xl border-2 border-gray-200 p-5 hover:border-blue-300 hover:shadow-md transition-all"
                             >
                                 <div className="flex items-start justify-between mb-3">
@@ -63,20 +44,6 @@ export default function HistoryPage() {
                                         <span>{new Date(item.cookedAt).toLocaleDateString('ko-KR')}</span>
                                         <Clock className="w-4 h-4 ml-2" />
                                         <span>{new Date(item.cookedAt).toLocaleTimeString('ko-KR', { hour: '2-digit', minute: '2-digit' })}</span>
-                                    </div>
-                                </div>
-
-                                <div>
-                                    <p className="text-sm text-gray-500 mb-2">차감된 재료:</p>
-                                    <div className="flex flex-wrap gap-2">
-                                        {item.deductedIngredients.map((ing, idx) => (
-                                            <span
-                                                key={idx}
-                                                className="px-3 py-1 bg-red-50 text-red-600 text-xs rounded-full font-medium"
-                                            >
-                        {ing.name} -{ing.deducted}{ing.unit}
-                      </span>
-                                        ))}
                                     </div>
                                 </div>
                             </div>

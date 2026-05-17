@@ -1,96 +1,71 @@
-import { useState } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { X, Calendar, Snowflake, Droplet, Cloud, Search } from 'lucide-react';
-
-// 백엔드 연동 전 Mock 식재료 데이터
-const MOCK_INGREDIENTS = [
-    { id: 1, name: '돼지고기 삼겹살', category: '육류', defaultShelfLife: 3 },
-    { id: 2, name: '돼지고기 목살', category: '육류', defaultShelfLife: 3 },
-    { id: 3, name: '소고기 등심', category: '육류', defaultShelfLife: 3 },
-    { id: 4, name: '닭가슴살', category: '육류', defaultShelfLife: 3 },
-    { id: 5, name: '김치', category: '채소', defaultShelfLife: 30 },
-    { id: 6, name: '양파', category: '채소', defaultShelfLife: 14 },
-    { id: 7, name: '대파', category: '채소', defaultShelfLife: 7 },
-    { id: 8, name: '당근', category: '채소', defaultShelfLife: 14 },
-    { id: 9, name: '두부', category: '유제품', defaultShelfLife: 5 },
-    { id: 10, name: '계란', category: '유제품', defaultShelfLife: 14 },
-    { id: 11, name: '우유', category: '유제품', defaultShelfLife: 7 },
-    { id: 12, name: '사과', category: '과일', defaultShelfLife: 14 },
-    { id: 13, name: '바나나', category: '과일', defaultShelfLife: 5 },
-    { id: 14, name: '고등어', category: '해산물', defaultShelfLife: 2 },
-    { id: 15, name: '새우', category: '해산물', defaultShelfLife: 2 },
-    { id: 16, name: '쌀', category: '곡물', defaultShelfLife: 365 },
-    { id: 17, name: '간장', category: '조미료', defaultShelfLife: 365 },
-    { id: 18, name: '설탕', category: '조미료', defaultShelfLife: 365 },
-    { id: 19, name: '참기름', category: '조미료', defaultShelfLife: 180 },
-    { id: 20, name: '마늘', category: '채소', defaultShelfLife: 14 },
-];
+import { searchIngredients } from '../api/ingredient';
+import { addFridgeItem } from '../api/fridge';
 
 export function AddIngredientModal({ isOpen, onClose, onSubmit }) {
     const [keyword, setKeyword] = useState('');
     const [selectedIngredient, setSelectedIngredient] = useState(null);
+    const [searchResults, setSearchResults] = useState([]);
     const [showDropdown, setShowDropdown] = useState(false);
     const [formData, setFormData] = useState({
         quantity: '',
         unit: 'g',
         storageMethod: 'refrigerated',
         purchaseDate: '',
-        expiryDate: '',
     });
 
-    // 검색 필터링
-    const filtered = keyword.length > 0
-        ? MOCK_INGREDIENTS.filter((i) => i.name.includes(keyword))
-        : [];
+    const dropdownRef = useRef(null);
 
-    // 구매일 입력 시 유통기한 자동 계산
-    const handlePurchaseDateChange = (date) => {
-        setFormData((prev) => {
-            if (selectedIngredient && date) {
-                const purchase = new Date(date);
-                purchase.setDate(purchase.getDate() + selectedIngredient.defaultShelfLife);
-                const expiry = purchase.toISOString().split('T')[0];
-                return { ...prev, purchaseDate: date, expiryDate: expiry };
+    useEffect(() => {
+        const handleClickOutside = (e) => {
+            if (dropdownRef.current && !dropdownRef.current.contains(e.target)) {
+                setShowDropdown(false);
             }
-            return { ...prev, purchaseDate: date };
-        });
+        };
+        document.addEventListener('mousedown', handleClickOutside);
+        return () => document.removeEventListener('mousedown', handleClickOutside);
+    }, []);
+
+    const handlePurchaseDateChange = (date) => {
+        setFormData((prev) => ({ ...prev, purchaseDate: date }));
     };
 
     const handleSelect = (ingredient) => {
         setSelectedIngredient(ingredient);
         setKeyword(ingredient.name);
         setShowDropdown(false);
-
-        // 선택 후 구매일 있으면 유통기한 재계산
-        if (formData.purchaseDate) {
-            handlePurchaseDateChange(formData.purchaseDate);
-        }
+        setSearchResults([]);
     };
-
-    const handleSubmit = (e) => {
+    const handleSubmit = async (e) => {
         e.preventDefault();
         if (!selectedIngredient) return;
-        onSubmit({
-            name: selectedIngredient.name,
-            category: selectedIngredient.category,
-            quantity: formData.quantity,
-            unit: formData.unit,
-            storageMethod: formData.storageMethod,
-            purchaseDate: formData.purchaseDate,
-            expiryDate: formData.expiryDate,
-        });
-        handleCancel();
+        try {
+            await addFridgeItem({
+                ingredientId: selectedIngredient.id,
+                storageType: formData.storageMethod === 'frozen' ? '냉동' :
+                    formData.storageMethod === 'refrigerated' ? '냉장' : '실온',
+                addDate: formData.purchaseDate,
+                userUnit: formData.unit,
+                userQuantity: parseFloat(formData.quantity),
+            });
+            onSubmit();
+            handleCancel();
+        } catch (err) {
+            console.error(err);
+            alert('식재료 추가에 실패했어요. 다시 시도해주세요.');
+        }
     };
-
     const handleCancel = () => {
         setKeyword('');
         setSelectedIngredient(null);
         setShowDropdown(false);
+        setSearchResults([]);
         setFormData({
             quantity: '',
             unit: 'g',
             storageMethod: 'refrigerated',
             purchaseDate: '',
-            expiryDate: '',
         });
         onClose();
     };
@@ -116,17 +91,27 @@ export function AddIngredientModal({ isOpen, onClose, onSubmit }) {
                                 <h3 className="text-lg font-semibold text-gray-700 mb-4">기본 정보</h3>
 
                                 {/* 식재료 검색 */}
-                                <div className="relative">
+                                <div className="relative" ref={dropdownRef}>
                                     <label className="block text-sm font-medium text-gray-700 mb-2">식재료 검색</label>
                                     <div className="relative">
                                         <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
                                         <input
                                             type="text"
                                             value={keyword}
-                                            onChange={(e) => {
+                                            onChange={async (e) => {
                                                 setKeyword(e.target.value);
                                                 setSelectedIngredient(null);
                                                 setShowDropdown(true);
+                                                if (e.target.value.length > 0) {
+                                                    try {
+                                                        const results = await searchIngredients(e.target.value);
+                                                        setSearchResults(results);
+                                                    } catch (err) {
+                                                        console.error(err);
+                                                    }
+                                                } else {
+                                                    setSearchResults([]);
+                                                }
                                             }}
                                             onFocus={() => setShowDropdown(true)}
                                             placeholder="예: 삼겹살"
@@ -136,17 +121,17 @@ export function AddIngredientModal({ isOpen, onClose, onSubmit }) {
                                     </div>
 
                                     {/* 드롭다운 */}
-                                    {showDropdown && filtered.length > 0 && (
+                                    {showDropdown && searchResults.length > 0 && (
                                         <div className="absolute z-10 w-full mt-1 bg-white border border-gray-200 rounded-lg shadow-lg max-h-48 overflow-y-auto">
-                                            {filtered.map((item) => (
+                                            {searchResults.map((item) => (
                                                 <button
-                                                    key={item.id}
+                                                    key={item.ingredientId}
                                                     type="button"
                                                     onClick={() => handleSelect(item)}
                                                     className="w-full flex items-center justify-between px-4 py-2.5 hover:bg-blue-50 transition-colors text-left"
                                                 >
                                                     <span className="text-sm font-medium text-gray-800">{item.name}</span>
-                                                    <span className="text-xs text-gray-400 bg-gray-100 px-2 py-0.5 rounded-full">{item.category}</span>
+                                                    <span className="text-xs text-gray-400 bg-gray-100 px-2 py-0.5 rounded-full">{item.categoryName}</span>
                                                 </button>
                                             ))}
                                         </div>
@@ -228,26 +213,23 @@ export function AddIngredientModal({ isOpen, onClose, onSubmit }) {
                                     </div>
                                 </div>
 
-                                {/* 유통기한 (자동 계산, 읽기 전용) */}
+                                {/* 유통기한 */}
                                 <div>
                                     <label className="block text-sm font-medium text-gray-700 mb-2">
                                         유통기한
-                                        <span className="ml-2 text-xs text-blue-500">(구매일 기준 자동 계산)</span>
+                                        <span className="ml-2 text-xs text-blue-500">(자동 계산)</span>
                                     </label>
                                     <div className="relative">
                                         <input
-                                            type="date"
-                                            value={formData.expiryDate}
+                                            type="text"
+                                            value="등록 후 자동 계산됩니다"
                                             readOnly
-                                            className="w-full px-4 py-2.5 border border-gray-200 rounded-lg bg-gray-50 text-gray-600 cursor-not-allowed outline-none"
+                                            className="w-full px-4 py-2.5 border border-gray-200 rounded-lg bg-gray-50 text-gray-400 cursor-not-allowed outline-none"
                                         />
-                                        <Calendar className="absolute right-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400 pointer-events-none" />
                                     </div>
-                                    {selectedIngredient && (
-                                        <p className="text-xs text-gray-400 mt-1">
-                                            기본 유통기한: {selectedIngredient.defaultShelfLife}일
-                                        </p>
-                                    )}
+                                    <p className="text-xs text-gray-400 mt-1">
+                                        카테고리 기본 유통기한 기준으로 자동 산출돼요
+                                    </p>
                                 </div>
                             </div>
                         </div>

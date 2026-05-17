@@ -4,18 +4,16 @@ import {
 } from 'lucide-react';
 import { RecipeModal } from './RecipeModal';
 
-const getCategoryIcon = (category) => {
+const getCategoryIcon = (ingredientName) => {
     const iconClass = "w-16 h-16";
-    switch (category) {
-        case '육류': return <Beef className={iconClass} />;
-        case '채소': return <Carrot className={iconClass} />;
-        case '과일': return <Apple className={iconClass} />;
-        case '유제품': return <Milk className={iconClass} />;
-        case '해산물': return <Fish className={iconClass} />;
-        case '곡물': return <Wheat className={iconClass} />;
-        case '조미료': return <Soup className={iconClass} />;
-        default: return <UtensilsCrossed className={iconClass} />;
-    }
+    const name = ingredientName || '';
+    if (name.includes('고기') || name.includes('삼겹') || name.includes('목살') || name.includes('닭') || name.includes('소고기')) return <Beef className={iconClass} />;
+    if (name.includes('생선') || name.includes('고등어') || name.includes('새우') || name.includes('오징어')) return <Fish className={iconClass} />;
+    if (name.includes('우유') || name.includes('치즈') || name.includes('버터') || name.includes('두부') || name.includes('계란')) return <Milk className={iconClass} />;
+    if (name.includes('사과') || name.includes('바나나') || name.includes('딸기') || name.includes('귤')) return <Apple className={iconClass} />;
+    if (name.includes('쌀') || name.includes('밀가루') || name.includes('보리')) return <Wheat className={iconClass} />;
+    if (name.includes('간장') || name.includes('된장') || name.includes('고추장') || name.includes('참기름') || name.includes('소금') || name.includes('설탕')) return <Soup className={iconClass} />;
+    return <Carrot className={iconClass} />;
 };
 
 const Shelf = ({ children, isDrawer = false }) => (
@@ -39,8 +37,9 @@ const Shelf = ({ children, isDrawer = false }) => (
 
 const IngredientItem = ({ ingredient, onClick, onDelete }) => {
     const today = new Date();
-    const expiryDate = new Date(ingredient.expiryDate);
-    const daysUntilExpiry = Math.ceil((expiryDate.getTime() - today.getTime()) / (1000 * 60 * 60 * 24));
+    today.setHours(0, 0, 0, 0);
+    const expiryDate = new Date(ingredient.expireDate);
+    const daysUntilExpiry = Math.ceil((expiryDate - today) / (1000 * 60 * 60 * 24));
     const isExpiringSoon = daysUntilExpiry <= 3 && daysUntilExpiry >= 0;
     const isExpired = daysUntilExpiry < 0;
 
@@ -51,25 +50,25 @@ const IngredientItem = ({ ingredient, onClick, onDelete }) => {
                     isExpiringSoon ? 'bg-yellow-100/80 border-2 border-yellow-400 shadow-lg' :
                         'hover:bg-white/80 hover:shadow-xl'
             }`}>
-                <div
-                    className={`mb-2 ${isExpired ? 'text-red-600' : isExpiringSoon ? 'text-yellow-700' : 'text-gray-700'}`}>
-                    {getCategoryIcon(ingredient.category)}
+                <div className={`mb-2 ${isExpired ? 'text-red-600' : isExpiringSoon ? 'text-yellow-700' : 'text-gray-700'}`}>
+                    {getCategoryIcon(ingredient.ingredientName)}
                 </div>
                 <div className="text-sm font-semibold text-gray-900 text-center truncate w-full px-1">
-                    {ingredient.name}
+                    {ingredient.ingredientName}
                 </div>
-                <div className="text-xs text-gray-600 mt-1">{ingredient.quantity}{ingredient.unit}</div>
+                <div className="text-xs text-gray-600 mt-1">{ingredient.quantity}{ingredient.standardUnit}</div>
                 <div className="mt-1 text-xs px-2 py-0.5 rounded-full bg-blue-100 text-blue-700">
-                    {ingredient.storageMethod === 'frozen' ? '❄️ 냉동' :
-                        ingredient.storageMethod === 'refrigerated' ? '💧 냉장' : '☁️ 실온'}
+                    {ingredient.storageType === '냉동' ? '❄️ 냉동' :
+                        ingredient.storageType === '냉장' ? '💧 냉장' : '☁️ 실온'}
                 </div>
                 <div className={`mt-1 text-xs flex items-center gap-1 ${
                     isExpired ? 'text-red-600 font-semibold' :
                         isExpiringSoon ? 'text-yellow-700 font-semibold' : 'text-gray-500'
                 }`}>
-                    <Calendar className="w-3 h-3"/>
+                    <Calendar className="w-3 h-3" />
                     {isExpired ? '만료됨' : `${daysUntilExpiry}일 남음`}
                 </div>
+
                 <button
                     onClick={(e) => {
                         e.stopPropagation();
@@ -79,22 +78,20 @@ const IngredientItem = ({ ingredient, onClick, onDelete }) => {
                 >
                     삭제
                 </button>
+
                 {/* 호버 툴팁 */}
-                <div
-                    className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 hidden group-hover:block z-10 pointer-events-none">
+                <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 hidden group-hover:block z-10 pointer-events-none">
                     <div className="bg-gray-900 text-white text-xs rounded-lg py-2 px-3 whitespace-nowrap shadow-xl">
-                        <div className="font-semibold mb-1">{ingredient.name}</div>
-                        <div className="text-gray-300">{ingredient.category}</div>
-                        <div className="text-gray-300">구매: {ingredient.purchaseDate}</div>
-                        <div
-                            className={`${isExpired ? 'text-red-400' : isExpiringSoon ? 'text-yellow-400' : 'text-gray-300'}`}>
-                            유통: {ingredient.expiryDate}
+                        <div className="font-semibold mb-1">{ingredient.ingredientName}</div>
+                        <div className="text-gray-300">{ingredient.categoryName}</div>
+                        <div className="text-gray-300">입고일: {ingredient.addDate}</div>
+                        <div className={`${isExpired ? 'text-red-400' : isExpiringSoon ? 'text-yellow-400' : 'text-gray-300'}`}>
+                            유통기한: {ingredient.expireDate}
                             {isExpired && ' ⚠️ 만료됨'}
                             {isExpiringSoon && ` ⚠️ ${daysUntilExpiry}일 남음`}
                         </div>
                         <div className="text-blue-300 mt-1 text-center">클릭하여 레시피 보기</div>
-                        <div
-                            className="absolute top-full left-1/2 -translate-x-1/2 border-4 border-transparent border-t-gray-900"></div>
+                        <div className="absolute top-full left-1/2 -translate-x-1/2 border-4 border-transparent border-t-gray-900"></div>
                     </div>
                 </div>
             </div>
@@ -102,7 +99,7 @@ const IngredientItem = ({ ingredient, onClick, onDelete }) => {
     );
 };
 
-export function RefrigeratorView({ingredients, onDelete, onCook}) {
+export function RefrigeratorView({ ingredients, onDelete, onCook }) {
     const [selectedIngredient, setSelectedIngredient] = useState(null);
     const [isRecipeModalOpen, setIsRecipeModalOpen] = useState(false);
 
@@ -135,9 +132,14 @@ export function RefrigeratorView({ingredients, onDelete, onCook}) {
                     {shelves.map((shelfItems, index) => (
                         <Shelf key={index} isDrawer={index === 3}>
                             {shelfItems.length > 0 ? (
-                                <div className="flex items-center gap-6 overflow-x-auto pb-2 justify-start">
-                                    {shelfItems.map((ingredient, idx) => (
-                                        <IngredientItem key={idx} ingredient={ingredient} onClick={handleIngredientClick} onDelete={onDelete} />
+                                <div className="flex flex-wrap gap-6 pb-2">
+                                    {shelfItems.map((ingredient) => (
+                                        <IngredientItem
+                                            key={ingredient.id}
+                                            ingredient={ingredient}
+                                            onClick={handleIngredientClick}
+                                            onDelete={onDelete}
+                                        />
                                     ))}
                                 </div>
                             ) : (
@@ -151,9 +153,9 @@ export function RefrigeratorView({ingredients, onDelete, onCook}) {
 
                 <div className="mt-6 text-center">
                     <div className="inline-block bg-gray-50/80 backdrop-blur-sm px-6 py-2 rounded-full shadow-md border border-gray-300">
-            <span className="text-sm font-semibold text-gray-700">
-              총 {ingredients.length}개의 식재료 보관 중
-            </span>
+                        <span className="text-sm font-semibold text-gray-700">
+                            총 {ingredients.length}개의 식재료 보관 중
+                        </span>
                     </div>
                 </div>
             </div>

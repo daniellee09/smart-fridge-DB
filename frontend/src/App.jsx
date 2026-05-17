@@ -1,68 +1,50 @@
-import { useState } from 'react';
-import { BrowserRouter, Routes, Route, NavLink } from 'react-router-dom';
+import { useState, useEffect } from 'react';
+import { BrowserRouter, Routes, Route, NavLink, Navigate } from 'react-router-dom';
 import { AddIngredientModal } from './components/AddIngredientModal';
-import { RefrigeratorView } from './components/RefrigeratorView';
+import FridgePage from './pages/FridgePage';
 import RecipesPage from './pages/RecipesPage';
 import HistoryPage from './pages/HistoryPage';
-import { Plus, Refrigerator, ChefHat, ClipboardList } from 'lucide-react';
-
-function FridgePage({ ingredients, onDelete, onCook, onOpenModal }) {
-    return (
-        <div className="min-h-screen bg-gradient-to-br from-gray-100 via-gray-50 to-white p-8">
-            <div className="max-w-6xl mx-auto">
-                <div className="flex items-center justify-between mb-8">
-                    <h1 className="text-4xl font-bold text-gray-800">나의 냉장고</h1>
-                    <button
-                        onClick={onOpenModal}
-                        className="inline-flex items-center gap-2 px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-medium shadow-lg hover:shadow-xl"
-                    >
-                        <Plus className="w-5 h-5" />
-                        새 식재료 추가
-                    </button>
-                </div>
-                <RefrigeratorView
-                    ingredients={ingredients}
-                    onDelete={onDelete}
-                    onCook={onCook}
-                />
-            </div>
-        </div>
-    );
-}
+import { Refrigerator, ChefHat, ClipboardList } from 'lucide-react';
+import { getFridge, deleteFridgeItem } from './api/fridge';
+import { cookRecipe } from './api/recipe';
 
 export default function App() {
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [ingredients, setIngredients] = useState([]);
 
-    const handleAddIngredient = (data) => {
-        setIngredients([...ingredients, data]);
+    const fetchFridge = async () => {
+        try {
+            const data = await getFridge();
+            setIngredients(data);
+        } catch (err) {
+            console.error('냉장고 데이터 불러오기 실패:', err);
+        }
     };
 
-    const handleDeleteIngredient = (target) => {
-        setIngredients(ingredients.filter((item) => item !== target));
+    useEffect(() => {
+        fetchFridge();
+    }, []);
+
+    const handleAddIngredient = () => {
+        fetchFridge();
     };
 
-    const handleCook = (recipeIngredients) => {
-        setIngredients((prev) => {
-            let updated = [...prev];
-            recipeIngredients.forEach((recipeIng) => {
-                let remainQty = recipeIng.qty;
-                updated = updated.map((fridgeItem) => {
-                    if (fridgeItem.name !== recipeIng.name) return fridgeItem;
-                    const currentQty = parseFloat(fridgeItem.quantity);
-                    if (remainQty <= 0) return fridgeItem;
-                    const deducted = Math.min(currentQty, remainQty);
-                    remainQty -= deducted;
-                    return { ...fridgeItem, quantity: String(currentQty - deducted) };
-                });
-            });
-            return updated.filter((item) => parseFloat(item.quantity) > 0);
-        });
+    const handleDeleteIngredient = async (target) => {
+        try {
+            await deleteFridgeItem(target.id);
+            fetchFridge();
+        } catch (err) {
+            console.error('삭제 실패:', err);
+            alert('삭제에 실패했어요. 다시 시도해주세요.');
+        }
+    };
+
+    const handleCook = () => {
+        fetchFridge();
     };
 
     return (
         <BrowserRouter>
-            {/* 네비게이션 */}
             <nav className="sticky top-0 z-40 bg-white border-b border-gray-200 shadow-sm">
                 <div className="max-w-6xl mx-auto px-8 py-3 flex items-center gap-6">
                     <span className="text-xl font-bold text-blue-600">🧊 스마트 냉장고</span>
@@ -104,8 +86,8 @@ export default function App() {
                 </div>
             </nav>
 
-            {/* 페이지 */}
             <Routes>
+                <Route path="/" element={<Navigate to="/fridge" replace />} />
                 <Route
                     path="/fridge"
                     element={
@@ -119,14 +101,7 @@ export default function App() {
                 />
                 <Route path="/recipes" element={<RecipesPage />} />
                 <Route path="/history" element={<HistoryPage />} />
-                <Route path="/" element={
-                    <FridgePage
-                        ingredients={ingredients}
-                        onDelete={handleDeleteIngredient}
-                        onCook={handleCook}
-                        onOpenModal={() => setIsModalOpen(true)}
-                    />
-                } />
+                <Route path="*" element={<Navigate to="/fridge" replace />} />
             </Routes>
 
             <AddIngredientModal
