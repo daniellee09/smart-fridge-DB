@@ -9,6 +9,7 @@
 import argparse
 import json
 import logging
+import re
 from collections import Counter
 
 from .config import DATA_PROCESSED_DIR, REAL_RECIPE_ID_START, MIN_INGREDIENT_FREQ
@@ -67,15 +68,18 @@ def _load_dummy_master() -> list[dict]:
     return rows
 
 
+_STEP_JUNK_RE = re.compile(r"^\d+\.\s*|[a-zA-Z]\s*$")
+
+
 def _build_description(record: dict) -> str:
     steps = []
     for i in range(1, 21):
         key = f"MANUAL{i:02d}"
         text = (record.get(key) or "").strip()
         if text:
-            import re
-            text = re.sub(r"^\d+\.\s*", "", text)
-            steps.append(f"[단계 {len(steps)+1}] {text}")
+            text = _STEP_JUNK_RE.sub("", text).strip()
+            if text:
+                steps.append(f"[단계 {len(steps)+1}] {text}")
     return "\n".join(steps)[:60000]
 
 

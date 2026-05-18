@@ -17,9 +17,13 @@ _ROW_RE = re.compile(
     r"\s*(?:\((?P<alt>[^)]+)\))?\s*$"
 )
 
-# 섹션 헤더 판정: 콤마·숫자가 없고 5글자 이하
+# 섹션 헤더 판정: 콤마·숫자가 없고 8글자 이하
 _SECTION_RE = re.compile(r"^[가-힣A-Za-z\s]{1,8}$")
 _SECTION_KEYWORDS = {"양념", "양념장", "고명", "소스", "반죽", "육수", "기타재료", "재료"}
+# 불릿·특수기호 접두어 (API 원본의 섹션 구분자)
+_BULLET_RE = re.compile(r"^[●◆◇○■□▶▷★☆※•·＊\*]+")
+# 이름 정제: 끝의 ":" 또는 알파벳 한 글자(a~z) 제거
+_TRAIL_JUNK_RE = re.compile(r"[\s:]+$|[a-z]$")
 
 
 @dataclass
@@ -33,9 +37,19 @@ class ParsedIngredient:
 
 def _is_section_header(text: str) -> bool:
     t = text.strip()
+    # 불릿 접두어가 있으면 섹션 헤더
+    if _BULLET_RE.match(t):
+        return True
     if any(kw in t for kw in _SECTION_KEYWORDS):
         return True
     return bool(_SECTION_RE.match(t)) and "," not in t and not any(c.isdigit() for c in t)
+
+
+def _clean_name(name: str) -> str:
+    """재료명 후처리: 불릿·콜론·끝 알파벳 잔재 제거."""
+    name = _BULLET_RE.sub("", name).strip()
+    name = _TRAIL_JUNK_RE.sub("", name).strip()
+    return name
 
 
 def _parse_qty(raw: str | None) -> float | None:
@@ -72,16 +86,21 @@ def parse(rcp_parts: str) -> list[ParsedIngredient]:
                 continue
             m = _ROW_RE.match(item)
             if not m:
-                # 파싱 실패 → 이름만 저장 (qty=None → vague 처리)
+                cleaned = _clean_name(item)
+                if not cleaned:
+                    continue
                 results.append(ParsedIngredient(
-                    raw_name=item,
+                    raw_name=cleaned,
                     qty=None,
                     unit=None,
                     under_seasoning_section=in_seasoning,
                 ))
                 continue
+            cleaned_name = _clean_name(m.group("name"))
+            if not cleaned_name:
+                continue
             results.append(ParsedIngredient(
-                raw_name=m.group("name").strip(),
+                raw_name=cleaned_name,
                 qty=_parse_qty(m.group("qty")),
                 unit=m.group("unit"),
                 under_seasoning_section=in_seasoning,
