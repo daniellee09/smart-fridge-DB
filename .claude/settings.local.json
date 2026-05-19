@@ -3,7 +3,8 @@
     "allow": [
       "Bash(mkdir -p backend frontend db docs .github)",
       "Bash(touch backend/.gitkeep frontend/.gitkeep db/.gitkeep docs/.gitkeep)",
-      "Bash(mkdir -p backend/src/main/resources)"
+      "Bash(mkdir -p backend/src/main/resources)",
+      "Bash(gh pr *)"
     ]
   }
 }
