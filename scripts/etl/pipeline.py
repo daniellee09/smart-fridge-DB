@@ -26,7 +26,7 @@ logging.basicConfig(level=logging.INFO, format="%(levelname)s %(message)s")
 logger = logging.getLogger(__name__)
 
 # 더미 데이터 ingredient_id 범위 (03_dummy_data.sql 기반)
-DUMMY_INGREDIENT_ID_MAX = 46
+DUMMY_INGREDIENT_ID_MAX = 40
 
 # 양념 계열 category_id (03_dummy_data.sql 기반: 5=양념류)
 SEASONING_CATEGORY_IDS = {5}
