@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Clock, Users, ChefHat, Search } from 'lucide-react';
-import { getRecipes, getRecipeDetail } from '../api/recipe';
+import { getRecipes, getRecipeDetail, getRecommendedRecipes } from '../api/recipe';
 
 const difficultyColor = {
     'easy': 'bg-green-100 text-green-700',
@@ -97,18 +97,21 @@ export default function RecipesPage() {
     const [selectedDifficulty, setSelectedDifficulty] = useState('전체');
     const [keyword, setKeyword] = useState('');
     const [selectedRecipe, setSelectedRecipe] = useState(null);
+    const [mode, setMode] = useState('all'); // 'all' | 'makeable'
 
     useEffect(() => {
         const fetchRecipes = async () => {
             try {
-                const data = await getRecipes();
+                const data = mode === 'makeable'
+                    ? await getRecommendedRecipes()
+                    : await getRecipes();
                 setRecipes(data);
             } catch (err) {
                 console.error('레시피 불러오기 실패:', err);
             }
         };
         fetchRecipes();
-    }, []);
+    }, [mode]);
 
     const filtered = recipes.filter((r) => {
         const matchDifficulty = selectedDifficulty === '전체' || r.difficulty === selectedDifficulty;
@@ -132,6 +135,25 @@ export default function RecipesPage() {
                             placeholder="레시피 검색..."
                             className="w-full pl-9 pr-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none"
                         />
+                    </div>
+                    {/* 전체 / 지금 만들 수 있는 토글 */}
+                    <div className="flex gap-1 bg-gray-100 rounded-lg p-1">
+                        {[
+                            { label: '전체', value: 'all' },
+                            { label: '지금 만들 수 있는', value: 'makeable' },
+                        ].map((m) => (
+                            <button
+                                key={m.value}
+                                onClick={() => setMode(m.value)}
+                                className={`px-4 py-2 rounded-md text-sm font-medium transition-colors ${
+                                    mode === m.value
+                                        ? 'bg-white text-blue-600 shadow-sm'
+                                        : 'text-gray-500 hover:text-gray-700'
+                                }`}
+                            >
+                                {m.label}
+                            </button>
+                        ))}
                     </div>
                     <div className="flex gap-2">
                         {[
