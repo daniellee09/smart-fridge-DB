@@ -1,0 +1,9 @@
+{
+  "약간": { "value": 2, "unit": "g" },
+  "적당량": { "value": 5, "unit": "g" },
+  "1꼬집": { "value": 1, "unit": "g" },
+  "꼬집": { "value": 1, "unit": "g" },
+  "조금": { "value": 3, "unit": "g" },
+  "소량": { "value": 2, "unit": "g" },
+  "기본": { "value": 5, "unit": "g" }
+}

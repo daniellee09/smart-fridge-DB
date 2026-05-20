@@ -46,3 +46,19 @@ WORKLOG.md
 
 # Claude self-check log (not for team sharing)
 SELF_CHECK.md
+
+# ETL plan (local planning doc, not for team sharing)
+docs/ETL_PLAN.md
+
+# ETL 원본 캐시·리포트 (재현 가능하므로 커밋 불필요)
+scripts/data/raw/
+scripts/data/reports/
+scripts/.env
+
+# Python bytecode
+__pycache__/
+*.pyc
+*.pyo
+
+# Personal handoff memos to teammates (drafts, not for team sharing in repo)
+HANDOFF_*.md
