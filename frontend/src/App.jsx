@@ -6,7 +6,6 @@ import RecipesPage from './pages/RecipesPage';
 import HistoryPage from './pages/HistoryPage';
 import { Refrigerator, ChefHat, ClipboardList } from 'lucide-react';
 import { getFridge, deleteFridgeItem } from './api/fridge';
-import { cookRecipe } from './api/recipe';
 
 export default function App() {
     const [isModalOpen, setIsModalOpen] = useState(false);

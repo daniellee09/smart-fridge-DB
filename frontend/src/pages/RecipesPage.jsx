@@ -65,7 +65,7 @@ function RecipeDetailModal({ recipe, onClose }) {
                             <h3 className="font-semibold text-gray-800 mb-3">필요한 재료:</h3>
                             <div className="flex flex-wrap gap-2">
                                 {detail.ingredients.map((ing, idx) => (
-                                    <span key={idx} className={`px-3 py-1 rounded-full text-sm ${
+                                    <span key={ing.ingredientId} className={`px-3 py-1 rounded-full text-sm ${
                                         ing.essential
                                             ? 'bg-blue-100 text-blue-700 font-semibold'
                                             : 'bg-gray-100 text-gray-700'

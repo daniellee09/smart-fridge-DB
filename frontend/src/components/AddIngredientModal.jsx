@@ -125,7 +125,7 @@ export function AddIngredientModal({ isOpen, onClose, onSubmit }) {
                                         <div className="absolute z-10 w-full mt-1 bg-white border border-gray-200 rounded-lg shadow-lg max-h-48 overflow-y-auto">
                                             {searchResults.map((item) => (
                                                 <button
-                                                    key={item.ingredientId}
+                                                    key={item.id}
                                                     type="button"
                                                     onClick={() => handleSelect(item)}
                                                     className="w-full flex items-center justify-between px-4 py-2.5 hover:bg-blue-50 transition-colors text-left"
