@@ -1,6 +1,7 @@
 package com.smartfridge.controller;
 
 import com.smartfridge.common.ApiResponse;
+import com.smartfridge.dto.IngredientRecipeResponse;
 import com.smartfridge.dto.RecipeDetailResponse;
 import com.smartfridge.dto.RecipeSummaryResponse;
 import com.smartfridge.service.RecipeService;
@@ -24,6 +25,11 @@ public class RecipeController {
     @GetMapping("/recommend")
     public ApiResponse<List<RecipeSummaryResponse>> getRecommended() {
         return ApiResponse.ok(recipeService.getRecommended());
+    }
+
+    @GetMapping("/by-ingredient/{ingredientId}")
+    public ApiResponse<List<IngredientRecipeResponse>> getByIngredient(@PathVariable Integer ingredientId) {
+        return ApiResponse.ok(recipeService.getRecipesByIngredient(ingredientId));
     }
 
     @GetMapping("/{id}")

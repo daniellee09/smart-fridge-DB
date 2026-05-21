@@ -11,5 +11,9 @@ export const getRecipeDetail = (id) => client.get(`/recipes/${id}`);
 export const getRecommendedRecipes = (sort = 'expire') =>
     client.get('/recipes/recommend', { params: { sort } });
 
+// 특정 재료가 포함된 레시피 목록 (canMake, missingIngredients 포함)
+export const getRecipesByIngredient = (ingredientId) =>
+    client.get(`/recipes/by-ingredient/${ingredientId}`);
+
 // 요리 완료
 export const cookRecipe = (recipeId) => client.post(`/cook/${recipeId}`);

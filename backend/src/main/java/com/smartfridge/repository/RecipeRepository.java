@@ -1,5 +1,6 @@
 package com.smartfridge.repository;
 
+import com.smartfridge.dto.IngredientRecipeRow;
 import com.smartfridge.dto.RecipeSummaryProjection;
 import com.smartfridge.entity.Recipe;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -29,4 +30,20 @@ public interface RecipeRepository extends JpaRepository<Recipe, Integer> {
            "LEFT JOIN FETCH ri.ingredient " +
            "WHERE r.id = :id")
     Optional<Recipe> findDetailById(@Param("id") Integer id);
+
+    @Query(value = """
+            SELECT r.recipe_id AS recipeId, r.recipe_name AS recipeName, r.difficulty AS difficulty,
+                   r.estimated_time AS estimatedTime, r.description AS description,
+                   im.ingredient_name AS essentialName,
+                   CASE WHEN f.fridge_item_id IS NOT NULL THEN 1 ELSE 0 END AS satisfied
+            FROM Recipe r
+            JOIN Recipe_Ingredient ri ON r.recipe_id = ri.recipe_id AND ri.is_essential = TRUE
+            JOIN Ingredient_Master im ON ri.ingredient_id = im.ingredient_id
+            LEFT JOIN My_Fridge f ON ri.ingredient_id = f.ingredient_id AND f.quantity >= ri.required_qty
+            WHERE r.recipe_id IN (
+                SELECT recipe_id FROM Recipe_Ingredient WHERE ingredient_id = :ingredientId
+            )
+            ORDER BY r.recipe_id
+            """, nativeQuery = true)
+    List<IngredientRecipeRow> findByIngredientWithStatus(@Param("ingredientId") Integer ingredientId);
 }
