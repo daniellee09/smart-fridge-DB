@@ -64,18 +64,27 @@ function RecipeDetailModal({ recipe, onClose }) {
                         <div>
                             <h3 className="font-semibold text-gray-800 mb-3">필요한 재료:</h3>
                             <div className="flex flex-wrap gap-2">
-                                {detail.ingredients.map((ing, idx) => (
+                                {detail.ingredients.map((ing) => (
                                     <span key={ing.ingredientId} className={`px-3 py-1 rounded-full text-sm ${
                                         ing.essential
                                             ? 'bg-blue-100 text-blue-700 font-semibold'
                                             : 'bg-gray-100 text-gray-700'
                                     }`}>
-                    {ing.ingredientName} {ing.requiredQty}{ing.unit}
-                                        {ing.essential && ' *'}
-                  </span>
+                                        {ing.ingredientName} {ing.requiredQty}{ing.unit}{ing.essential && ' *'}
+                                    </span>
                                 ))}
                             </div>
                             <p className="text-xs text-gray-400 mt-2">* 필수 재료</p>
+                            <h3 className="font-semibold text-gray-800 mt-6 mb-3">조리 방법:</h3>
+                            {detail.description ? (
+                                <div className="space-y-2">
+                                    {detail.description.split('\n').filter(Boolean).map((step, i) => (
+                                        <p key={i} className="text-sm text-gray-700 leading-relaxed">{step}</p>
+                                    ))}
+                                </div>
+                            ) : (
+                                <p className="text-sm text-gray-400">조리 방법 정보가 없습니다.</p>
+                            )}
                         </div>
                     ) : (
                         <p className="text-gray-400 text-sm">불러오는 중...</p>

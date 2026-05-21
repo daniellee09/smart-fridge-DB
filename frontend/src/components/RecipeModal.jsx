@@ -119,6 +119,18 @@ export function RecipeModal({ isOpen, onClose, ingredient, onCook }) {
                                 </div>
                                 <p className="text-xs text-gray-400 mt-2">* 필수 재료</p>
                             </div>
+                            <div className="mb-6">
+                                <h4 className="font-semibold text-gray-800 mb-3">조리 방법:</h4>
+                                {selectedRecipe.description ? (
+                                    <div className="space-y-2">
+                                        {selectedRecipe.description.split('\n').filter(Boolean).map((step, i) => (
+                                            <p key={i} className="text-sm text-gray-700 leading-relaxed">{step}</p>
+                                        ))}
+                                    </div>
+                                ) : (
+                                    <p className="text-sm text-gray-400">조리 방법 정보가 없습니다.</p>
+                                )}
+                            </div>
                             <button
                                 onClick={() => handleCook(selectedRecipe.id)}
                                 className="w-full py-3 bg-green-500 hover:bg-green-600 text-white font-semibold rounded-xl transition-colors flex items-center justify-center gap-2"
