@@ -20,7 +20,10 @@ INSERT INTO Category (category_name, parent_id, default_days) VALUES
 ('김치류', 16, 30),
 ('두부류', 16, 7),
 ('면류', 16, 365),
-('통조림', 16, 730);
+('통조림', 16, 730),
+('해산물', 1, 3),
+('과일', 1, 7),
+('곡류', 1, 365);
 
 INSERT INTO Ingredient_Master (ingredient_name, category_id, base_unit) VALUES
 ('시금치', 6, 'g'),

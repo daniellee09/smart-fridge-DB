@@ -1,10 +1,10 @@
 import { useState, useEffect } from 'react';
-import { BrowserRouter, Routes, Route, NavLink, Navigate } from 'react-router-dom';
+import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { AddIngredientModal } from './components/AddIngredientModal';
+import Sidebar from './components/Sidebar';
 import FridgePage from './pages/FridgePage';
 import RecipesPage from './pages/RecipesPage';
 import HistoryPage from './pages/HistoryPage';
-import { Refrigerator, ChefHat, ClipboardList } from 'lucide-react';
 import { getFridge, deleteFridgeItem } from './api/fridge';
 
 export default function App() {
@@ -44,64 +44,28 @@ export default function App() {
 
     return (
         <BrowserRouter>
-            <nav className="sticky top-0 z-40 bg-white border-b border-gray-200 shadow-sm">
-                <div className="max-w-6xl mx-auto px-8 py-3 flex items-center gap-6">
-                    <span className="text-xl font-bold text-blue-600">🧊 스마트 냉장고</span>
-                    <div className="flex gap-2">
-                        <NavLink
-                            to="/fridge"
-                            className={({ isActive }) =>
-                                `flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
-                                    isActive ? 'bg-blue-600 text-white' : 'text-gray-600 hover:bg-gray-100'
-                                }`
+            <div className="flex min-h-screen bg-app-bg">
+                <Sidebar />
+                <main className="flex-1 min-w-0">
+                    <Routes>
+                        <Route path="/" element={<Navigate to="/fridge" replace />} />
+                        <Route
+                            path="/fridge"
+                            element={
+                                <FridgePage
+                                    ingredients={ingredients}
+                                    onDelete={handleDeleteIngredient}
+                                    onCook={handleCook}
+                                    onOpenModal={() => setIsModalOpen(true)}
+                                />
                             }
-                        >
-                            <Refrigerator className="w-4 h-4" />
-                            냉장고
-                        </NavLink>
-                        <NavLink
-                            to="/recipes"
-                            className={({ isActive }) =>
-                                `flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
-                                    isActive ? 'bg-blue-600 text-white' : 'text-gray-600 hover:bg-gray-100'
-                                }`
-                            }
-                        >
-                            <ChefHat className="w-4 h-4" />
-                            레시피
-                        </NavLink>
-                        <NavLink
-                            to="/history"
-                            className={({ isActive }) =>
-                                `flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
-                                    isActive ? 'bg-blue-600 text-white' : 'text-gray-600 hover:bg-gray-100'
-                                }`
-                            }
-                        >
-                            <ClipboardList className="w-4 h-4" />
-                            요리 이력
-                        </NavLink>
-                    </div>
-                </div>
-            </nav>
-
-            <Routes>
-                <Route path="/" element={<Navigate to="/fridge" replace />} />
-                <Route
-                    path="/fridge"
-                    element={
-                        <FridgePage
-                            ingredients={ingredients}
-                            onDelete={handleDeleteIngredient}
-                            onCook={handleCook}
-                            onOpenModal={() => setIsModalOpen(true)}
                         />
-                    }
-                />
-                <Route path="/recipes" element={<RecipesPage />} />
-                <Route path="/history" element={<HistoryPage />} />
-                <Route path="*" element={<Navigate to="/fridge" replace />} />
-            </Routes>
+                        <Route path="/recipes" element={<RecipesPage />} />
+                        <Route path="/history" element={<HistoryPage />} />
+                        <Route path="*" element={<Navigate to="/fridge" replace />} />
+                    </Routes>
+                </main>
+            </div>
 
             <AddIngredientModal
                 isOpen={isModalOpen}

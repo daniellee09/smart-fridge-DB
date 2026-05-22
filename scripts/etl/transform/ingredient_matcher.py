@@ -42,6 +42,10 @@ class IngredientMatcher:
     def _normalize(name: str) -> str:
         return name.replace(" ", "").lower()
 
+    def get_synonyms(self) -> dict[str, str]:
+        """동의어 사전 반환 (파이프라인에서 대표명 수렴에 사용)."""
+        return dict(self._synonyms)
+
     def match(self, raw_name: str) -> MatchResult:
         norm = self._normalize(raw_name)
 

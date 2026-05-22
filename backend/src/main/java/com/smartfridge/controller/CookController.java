@@ -24,4 +24,10 @@ public class CookController {
     public ApiResponse<List<CookHistoryResponse>> getHistory() {
         return ApiResponse.ok(cookService.getHistory());
     }
+
+    @DeleteMapping("/history/{historyId}")
+    public ApiResponse<Void> deleteHistory(@PathVariable Integer historyId) {
+        cookService.deleteHistory(historyId);
+        return ApiResponse.ok(null, "요리 이력이 삭제되었습니다.");
+    }
 }

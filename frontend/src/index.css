@@ -1,1 +1,8 @@
 @import "tailwindcss";
+
+@theme {
+  --color-toss-blue: #3182f6;
+  --color-toss-blue-hover: #1b64da;
+  --color-app-bg: #f9fafb;
+  --color-sidebar-bg: #ffffff;
+}
