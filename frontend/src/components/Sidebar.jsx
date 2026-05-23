@@ -1,5 +1,5 @@
 import { NavLink } from 'react-router-dom';
-import { Refrigerator, ChefHat, ClipboardList } from 'lucide-react';
+import { ChefHat, ClipboardList, Refrigerator } from 'lucide-react';
 
 const NAV_ITEMS = [
     { to: '/fridge', label: '냉장고', Icon: Refrigerator },
@@ -7,15 +7,24 @@ const NAV_ITEMS = [
     { to: '/history', label: '요리 이력', Icon: ClipboardList },
 ];
 
+function FridgeIcon() {
+    return (
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <rect x="5" y="2" width="14" height="20" rx="3" fill="#dbeafe" stroke="#3182F6" strokeWidth="2" strokeLinejoin="round"/>
+            <path d="M5 9.5h14" stroke="#3182F6" strokeWidth="2" strokeLinecap="round"/>
+            <path d="M9 5.5v2.5" stroke="#1d4ed8" strokeWidth="2.2" strokeLinecap="round"/>
+            <path d="M9 13v3.5" stroke="#1d4ed8" strokeWidth="2.2" strokeLinecap="round"/>
+        </svg>
+    );
+}
+
 function Logo() {
     return (
         <div className="flex items-center gap-2.5">
-            <div className="w-8 h-8 rounded-xl bg-gradient-to-br from-toss-blue to-[#5ba3ff] flex items-center justify-center shadow-sm">
-                <Refrigerator className="w-4 h-4 text-white" />
-            </div>
+            <FridgeIcon />
             <span style={{ fontFamily: "'Pretendard', sans-serif" }} className="text-[15px] tracking-tight leading-none">
-                <span style={{ fontWeight: 600 }} className="text-toss-blue">스마트</span>
-                <span style={{ fontWeight: 600 }} className="text-gray-900">냉장고</span>
+                <span style={{ fontWeight: 700 }} className="text-gray-900">냉장고</span>
+                <span style={{ fontWeight: 700 }} className="text-[#1d4ed8]">지킴이</span>
             </span>
         </div>
     );

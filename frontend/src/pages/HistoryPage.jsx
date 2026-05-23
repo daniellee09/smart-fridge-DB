@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { ChefHat, ChevronRight, Trash2 } from 'lucide-react';
+import { ChefHat, ClipboardList, ChevronRight, Trash2 } from 'lucide-react';
 import { getCookHistory, deleteCookHistory } from '../api/history';
 
 function formatDate(dateStr) {
@@ -54,13 +54,52 @@ export default function HistoryPage() {
         }
     };
 
+    const now = new Date();
+    const thisMonthCount = history.filter((h) => {
+        const d = new Date(h.cookedAt);
+        return d.getFullYear() === now.getFullYear() && d.getMonth() === now.getMonth();
+    }).length;
+    const latest = history.length
+        ? history.reduce((a, b) => (new Date(b.cookedAt) > new Date(a.cookedAt) ? b : a))
+        : null;
+
     return (
         <div className="p-8">
             <div className="max-w-3xl mx-auto">
                 {/* 헤더 */}
                 <div className="mb-8">
-                    <h1 className="text-2xl font-bold text-gray-900">요리 이력</h1>
-                    <p className="text-sm text-gray-400 mt-0.5">총 {history.length}번 요리했어요</p>
+                    <div className="flex items-center gap-3 mb-4">
+                        <div className="w-11 h-11 rounded-2xl bg-toss-blue/10 flex items-center justify-center flex-shrink-0">
+                            <ClipboardList className="w-5 h-5 text-toss-blue" />
+                        </div>
+                        <div>
+                            <h1 className="text-2xl font-bold text-gray-900">요리 이력</h1>
+                            <p className="text-sm text-gray-400 mt-0.5">지금까지 만든 요리를 모아봤어요</p>
+                        </div>
+                    </div>
+
+                    {history.length > 0 && (
+                        <div className="flex items-stretch rounded-2xl border border-gray-100 bg-white shadow-sm overflow-hidden">
+                            <div className="flex-1 px-5 py-3.5">
+                                <p className="text-xs text-gray-400">총 요리</p>
+                                <p className="text-lg font-bold text-toss-blue mt-0.5">
+                                    {history.length}<span className="text-sm font-medium text-gray-400">번</span>
+                                </p>
+                            </div>
+                            <div className="w-px bg-gray-100" />
+                            <div className="flex-1 px-5 py-3.5">
+                                <p className="text-xs text-gray-400">이번 달</p>
+                                <p className="text-lg font-bold text-gray-900 mt-0.5">
+                                    {thisMonthCount}<span className="text-sm font-medium text-gray-400">번</span>
+                                </p>
+                            </div>
+                            <div className="w-px bg-gray-100" />
+                            <div className="flex-1 px-5 py-3.5 min-w-0">
+                                <p className="text-xs text-gray-400">최근 요리</p>
+                                <p className="text-sm font-semibold text-gray-900 mt-1 truncate">{latest?.recipeName}</p>
+                            </div>
+                        </div>
+                    )}
                 </div>
 
                 {history.length === 0 ? (
