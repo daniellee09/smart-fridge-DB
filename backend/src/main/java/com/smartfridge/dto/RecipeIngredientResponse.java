@@ -9,15 +9,17 @@ public record RecipeIngredientResponse(
         String ingredientName,
         BigDecimal requiredQty,
         String unit,
-        boolean essential
+        boolean essential,
+        BigDecimal fridgeQty
 ) {
-    public static RecipeIngredientResponse from(RecipeIngredient ri) {
+    public static RecipeIngredientResponse from(RecipeIngredient ri, BigDecimal fridgeQty) {
         return new RecipeIngredientResponse(
                 ri.getIngredient().getId(),
                 ri.getIngredient().getName(),
                 ri.getRequiredQty(),
                 ri.getUnit(),
-                ri.isEssential()
+                ri.isEssential(),
+                fridgeQty
         );
     }
 }

@@ -56,7 +56,12 @@ export default function FridgePage({ ingredients, onDelete, onCook, onOpenModal 
 
                     {/* 뷰: 냉장고 현황 */}
                     {tab === 'overview' && (
-                        <FridgeSummary ingredients={ingredients} />
+                        <FridgeSummary
+                            ingredients={ingredients}
+                            onViewStorage={() => setTab('storage')}
+                            onOpenModal={onOpenModal}
+                            onCook={onCook}
+                        />
                     )}
 
                     {/* 뷰: 보관 재료 */}

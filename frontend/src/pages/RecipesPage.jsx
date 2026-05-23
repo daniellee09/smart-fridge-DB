@@ -1,7 +1,8 @@
 import { useState, useEffect } from 'react';
-import { Clock, ChefHat, Search } from 'lucide-react';
+import { Clock, ChefHat, Sparkles, Zap, Search } from 'lucide-react';
 import { getRecipes, getRecommendedRecipes } from '../api/recipe';
 import RecipeDetailModal, { difficultyLabel, difficultyBadge } from '../components/RecipeDetailModal';
+
 
 const DIFFICULTY_OPTIONS = [
     { label: '전체', value: '전체' },
@@ -16,33 +17,134 @@ export default function RecipesPage() {
     const [keyword, setKeyword] = useState('');
     const [selectedRecipe, setSelectedRecipe] = useState(null);
     const [mode, setMode] = useState('all');
+    const [quickTime, setQuickTime] = useState(null);
+    const [refreshKey, setRefreshKey] = useState(0);
 
     useEffect(() => {
-        const fetch = async () => {
+        const load = async () => {
             try {
-                const data = mode === 'makeable' ? await getRecommendedRecipes() : await getRecipes();
-                setRecipes(data);
+                if (mode === 'makeable') {
+                    const data = await getRecommendedRecipes();
+                    setRecipes(data.map((r) => ({ ...r, canMake: true })));
+                } else {
+                    const [all, rec] = await Promise.all([getRecipes(), getRecommendedRecipes()]);
+                    const makeableIds = new Set(rec.map((r) => r.id));
+                    setRecipes(all.map((r) => ({ ...r, canMake: makeableIds.has(r.id) })));
+                }
             } catch (err) {
                 console.error('레시피 불러오기 실패:', err);
             }
         };
-        fetch();
-    }, [mode]);
+        load();
+    }, [mode, refreshKey]);
+
+    const handleCook = () => {
+        setRefreshKey((k) => k + 1);
+        setSelectedRecipe(null);
+    };
 
     const filtered = recipes.filter((r) => {
         const matchDifficulty = selectedDifficulty === '전체' || r.difficulty === selectedDifficulty;
         const matchKeyword = r.name.includes(keyword);
-        return matchDifficulty && matchKeyword;
+        const matchTime = quickTime === null || r.estimatedTime <= quickTime;
+        return matchDifficulty && matchKeyword && matchTime;
     });
+
+    const QUICK_CARDS = [
+        {
+            Icon: ChefHat, label: '간단 요리', offset: 'mb-5',
+            active: selectedDifficulty === 'easy',
+            color: 'rgba(56,189,248,0.25)',
+            activeColor: 'rgba(56,189,248,0.45)',
+            onClick: () => { setSelectedDifficulty('easy'); setMode('all'); setQuickTime(null); },
+        },
+        {
+            Icon: Sparkles, label: '재료 추천', offset: 'mb-0',
+            active: mode === 'makeable',
+            color: 'rgba(96,165,250,0.25)',
+            activeColor: 'rgba(96,165,250,0.45)',
+            onClick: () => { setMode('makeable'); setSelectedDifficulty('전체'); setQuickTime(null); },
+        },
+        {
+            Icon: Zap, label: '빠른 레시피', offset: 'mb-8',
+            active: quickTime !== null,
+            color: 'rgba(147,197,253,0.25)',
+            activeColor: 'rgba(147,197,253,0.45)',
+            onClick: () => { setQuickTime(20); setMode('all'); setSelectedDifficulty('전체'); },
+        },
+    ];
 
     return (
         <div className="p-8">
             <div className="max-w-6xl mx-auto">
                 {/* 헤더 */}
+                {/* 히어로 배너 */}
+                <div
+                    className="relative overflow-hidden rounded-3xl px-10 py-10 mb-8 border border-blue-200/70 shadow-lg shadow-blue-100/60 flex items-center justify-between"
+                    style={{ background: 'linear-gradient(135deg, #cfe8ff 0%, #dbeafe 50%, #f0f7ff 100%)' }}
+                >
+                    {/* 오로라 블롭 레이어 (밝은 톤) */}
+                    <div className="absolute z-0 pointer-events-none" style={{
+                        top: '-80px', left: '-40px', width: '320px', height: '320px', borderRadius: '50%',
+                        background: 'radial-gradient(circle, rgba(56,189,248,0.40) 0%, transparent 70%)',
+                        filter: 'blur(52px)',
+                        animation: 'aurora-blob-1 20s ease-in-out infinite',
+                    }} />
+                    <div className="absolute z-0 pointer-events-none" style={{
+                        top: '0px', right: '-40px', width: '300px', height: '300px', borderRadius: '50%',
+                        background: 'radial-gradient(circle, rgba(96,165,250,0.38) 0%, transparent 70%)',
+                        filter: 'blur(56px)',
+                        animation: 'aurora-blob-2 25s ease-in-out infinite',
+                    }} />
+                    <div className="absolute z-0 pointer-events-none" style={{
+                        bottom: '-70px', left: '38%', width: '280px', height: '280px', borderRadius: '50%',
+                        background: 'radial-gradient(circle, rgba(147,197,253,0.38) 0%, transparent 70%)',
+                        filter: 'blur(50px)',
+                        animation: 'aurora-blob-3 18s ease-in-out infinite',
+                    }} />
+
+                    {/* 왼쪽 텍스트 */}
+                    <div className="relative z-10">
+                        <div className="inline-flex items-center gap-1.5 rounded-full px-3 py-1 mb-4 bg-white/70 backdrop-blur border border-blue-100">
+                            <span className="w-1.5 h-1.5 rounded-full" style={{ background: '#10b981' }} />
+                            <p className="text-toss-blue text-xs font-semibold tracking-wide">냉장고 속 재료로 만드는</p>
+                        </div>
+                        <h1 className="text-blue-950 font-extrabold leading-[1.2] tracking-tight mb-3" style={{ fontSize: '2rem' }}>
+                            오늘은 뭘<br />만들어볼까요?
+                        </h1>
+                        <p className="text-gray-500 text-sm leading-relaxed">
+                            보유한 재료로 바로 만들 수 있는<br />레시피를 찾아드려요
+                        </p>
+                    </div>
+
+                    {/* 오른쪽 퀵 필터 카드 */}
+                    <div className="relative z-10 flex items-end gap-3 mr-2">
+                        {QUICK_CARDS.map((item) => (
+                            <button
+                                key={item.label}
+                                onClick={item.onClick}
+                                className={`${item.offset} flex flex-col items-center justify-center w-[76px] rounded-2xl gap-2.5 transition-all cursor-pointer pt-4 pb-3.5 backdrop-blur`}
+                                style={{
+                                    background: item.active ? 'rgba(255,255,255,0.95)' : 'rgba(255,255,255,0.6)',
+                                    border: item.active ? '1px solid rgba(49,130,246,0.45)' : '1px solid rgba(191,219,254,0.8)',
+                                    boxShadow: item.active ? '0 6px 18px rgba(49,130,246,0.18)' : '0 2px 8px rgba(15,23,42,0.04)',
+                                    transform: item.active ? 'scale(1.06)' : undefined,
+                                }}
+                            >
+                                <div className="w-9 h-9 rounded-xl flex items-center justify-center" style={{
+                                    background: item.active ? item.activeColor : item.color,
+                                }}>
+                                    <item.Icon size={18} color={item.active ? '#1b64da' : '#3182f6'} strokeWidth={1.8} />
+                                </div>
+                                <span className="text-[11px] font-semibold leading-none" style={{ color: item.active ? '#1b64da' : 'rgba(71,85,105,0.9)' }}>{item.label}</span>
+                            </button>
+                        ))}
+                    </div>
+                </div>
+
                 <div className="flex items-center justify-between mb-8">
                     <div>
-                        <h1 className="text-2xl font-bold text-gray-900">레시피</h1>
-                        <p className="text-sm text-gray-400 mt-0.5">{filtered.length}개의 레시피</p>
+                        <p className="text-sm text-gray-400">{filtered.length}개의 레시피</p>
                     </div>
 
                     {/* 전체 / 지금 만들 수 있는 토글 */}
@@ -118,9 +220,15 @@ export default function RecipesPage() {
                                         <Clock className="w-3.5 h-3.5" />
                                         {recipe.estimatedTime}분
                                     </span>
-                                    <span className="text-xs text-toss-blue opacity-0 group-hover:opacity-100 transition-opacity font-medium">
-                                        레시피 보기 →
-                                    </span>
+                                    {recipe.canMake ? (
+                                        <span className="text-xs font-medium px-2 py-0.5 rounded-full bg-green-50 text-green-600">
+                                            지금 만들 수 있음
+                                        </span>
+                                    ) : (
+                                        <span className="text-xs text-toss-blue opacity-0 group-hover:opacity-100 transition-opacity font-medium">
+                                            레시피 보기 →
+                                        </span>
+                                    )}
                                 </div>
                             </div>
                         ))}
@@ -128,7 +236,7 @@ export default function RecipesPage() {
                 )}
             </div>
 
-            <RecipeDetailModal recipe={selectedRecipe} onClose={() => setSelectedRecipe(null)} />
+            <RecipeDetailModal recipe={selectedRecipe} onClose={() => setSelectedRecipe(null)} onCook={handleCook} />
         </div>
     );
 }
