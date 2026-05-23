@@ -96,6 +96,23 @@ def _parse_qty(raw: str | None) -> float | None:
         return None
 
 
+# 괄호 안 수량 추출: 원본이 '재료명(100g)' 형식일 때 수량이 alt로 빠져 유실되는 것 복구
+_ALT_QTY_RE = re.compile(r"^\s*(?P<qty>[\d]+(?:[./][\d]+)?)\s*(?P<unit>" + _UNIT_PAT + r")?")
+
+
+def _qty_unit_from_alt(alt: str | None) -> tuple[float | None, str | None]:
+    """괄호 안 텍스트('100g', '3개', '1/4개')에서 수량·단위 추출.
+
+    숫자로 시작하지 않으면(예: '다진 것') None 반환 → 기존 vague 처리 유지.
+    """
+    if not alt:
+        return None, None
+    m = _ALT_QTY_RE.match(alt)
+    if not m:
+        return None, None
+    return _parse_qty(m.group("qty")), m.group("unit")
+
+
 def _split_protecting_parens(text: str) -> list[str]:
     """콤마로 분리하되 ( ) 안의 콤마는 보호."""
     result = []
@@ -157,12 +174,20 @@ def parse(rcp_parts: str) -> list[ParsedIngredient]:
             cleaned_name = _clean_name(m.group("name"))
             if _is_junk_fragment(cleaned_name):
                 continue
+            qty = _parse_qty(m.group("qty"))
+            unit = m.group("unit")
+            alt = m.group("alt")
+            # '재료명(100g)' 형식: 수량이 alt로 빠진 경우 복구
+            if qty is None and alt:
+                alt_qty, alt_unit = _qty_unit_from_alt(alt)
+                if alt_qty is not None:
+                    qty, unit = alt_qty, alt_unit
             results.append(ParsedIngredient(
                 raw_name=cleaned_name,
-                qty=_parse_qty(m.group("qty")),
-                unit=m.group("unit"),
+                qty=qty,
+                unit=unit,
                 under_seasoning_section=in_seasoning,
-                alt_text=m.group("alt"),
+                alt_text=alt,
             ))
 
     return results
