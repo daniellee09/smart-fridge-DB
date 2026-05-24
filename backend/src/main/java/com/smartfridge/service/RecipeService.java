@@ -4,17 +4,21 @@ import com.smartfridge.dto.IngredientRecipeResponse;
 import com.smartfridge.dto.IngredientRecipeRow;
 import com.smartfridge.dto.RecipeDetailResponse;
 import com.smartfridge.dto.RecipeSummaryResponse;
+import com.smartfridge.entity.MyFridge;
+import com.smartfridge.repository.MyFridgeRepository;
 import com.smartfridge.repository.RecipeRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.NoSuchElementException;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -22,6 +26,7 @@ import java.util.NoSuchElementException;
 public class RecipeService {
 
     private final RecipeRepository recipeRepository;
+    private final MyFridgeRepository myFridgeRepository;
 
     public List<RecipeSummaryResponse> getAll() {
         return recipeRepository.findAll().stream()
@@ -36,9 +41,13 @@ public class RecipeService {
     }
 
     public RecipeDetailResponse getDetail(Integer id) {
-        return recipeRepository.findDetailById(id)
-                .map(RecipeDetailResponse::from)
+        var recipe = recipeRepository.findDetailById(id)
                 .orElseThrow(() -> new NoSuchElementException("레시피를 찾을 수 없습니다. id=" + id));
+        Map<Integer, BigDecimal> fridgeMap = myFridgeRepository.findAllByOrderByExpireDateAsc().stream()
+                .collect(Collectors.groupingBy(
+                        f -> f.getIngredient().getId(),
+                        Collectors.reducing(BigDecimal.ZERO, MyFridge::getQuantity, BigDecimal::add)));
+        return RecipeDetailResponse.from(recipe, fridgeMap);
     }
 
     public List<IngredientRecipeResponse> getRecipesByIngredient(Integer ingredientId) {

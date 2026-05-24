@@ -98,16 +98,25 @@ def run(reset: bool = False, force_fetch: bool = False, dry_run: bool = False):
     new_ingredient_info: dict[str, dict] = {}
 
     # 1차 패스: 신규 재료 빈도 집계
+    # 동의어 사전에서 대표명 조회 — 동의어 변형들을 하나의 대표명으로 수렴시킴
+    synonyms = matcher.get_synonyms()
+
     for record in records:
         parts_raw = record.get("RCP_PARTS_DTLS", "")
         for pi in parse_ingredients(parts_raw):
             result = matcher.match(pi.raw_name)
             if result.method == "unmatched":
-                new_ingredient_counter[pi.raw_name] += 1
-                if pi.raw_name not in new_ingredient_info:
-                    new_ingredient_info[pi.raw_name] = {
-                        "ingredient_name": pi.raw_name,
-                        "category_id": assign_category(pi.raw_name),
+                # 동의어 대표명이 있으면 그 이름으로 통합 (변형마다 신규 행 생성 방지)
+                norm = pi.raw_name.replace(" ", "").lower()
+                canonical = synonyms.get(pi.raw_name) or synonyms.get(norm)
+                key = canonical if canonical else pi.raw_name
+                store_name = canonical if canonical else pi.raw_name
+
+                new_ingredient_counter[key] += 1
+                if key not in new_ingredient_info:
+                    new_ingredient_info[key] = {
+                        "ingredient_name": store_name,
+                        "category_id": assign_category(store_name),
                         "base_unit": pi.unit or "g",
                     }
 
