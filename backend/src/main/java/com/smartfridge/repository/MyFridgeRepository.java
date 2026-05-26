@@ -25,8 +25,12 @@ public interface MyFridgeRepository extends JpaRepository<MyFridge, Integer> {
      * 트리거 trg_auto_stock_reduce가 차감 시 user_quantity를 비례 차감하므로,
      * 복원 시에도 동일 비율로 user_quantity를 함께 늘려 일관성을 유지한다.
      * MariaDB는 SET 절을 좌→우 평가하므로 user_quantity를 quantity보다 먼저 계산해야 한다.
+     *
+     * clearAutomatically=false: caller가 같은 트랜잭션에서 LAZY 연관(Ingredient.category 등)을
+     * 이어서 접근하므로 1차 캐시를 비우면 LazyInitializationException 위험이 있다.
+     * 본 SQL은 update 대상 row를 같은 트랜잭션에서 다시 조회하지 않으므로 stale 캐시 문제도 없다.
      */
-    @Modifying(clearAutomatically = true)
+    @Modifying
         @Query(value = """
                        UPDATE My_Fridge
                        SET
