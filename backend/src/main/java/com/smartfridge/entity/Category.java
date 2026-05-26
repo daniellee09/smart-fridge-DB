@@ -31,4 +31,7 @@ public class Category {
 
     @Column(name = "default_days")
     private Integer defaultDays;
+
+    @Column(name = "default_storage_type", length = 10, nullable = false)
+    private String defaultStorageType;
 }

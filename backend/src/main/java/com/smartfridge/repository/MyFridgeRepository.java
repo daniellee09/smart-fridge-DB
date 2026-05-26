@@ -1,5 +1,6 @@
 package com.smartfridge.repository;
 
+import com.smartfridge.dto.FridgeStatusResponse;
 import com.smartfridge.entity.MyFridge;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
@@ -20,12 +21,23 @@ public interface MyFridgeRepository extends JpaRepository<MyFridge, Integer> {
         List<MyFridge> findByIngredientId(@Param("ingredientId") Integer ingredientId);
 
     /**
-     * 특정 냉장고 항목에 수량을 더함 (요리 이력 삭제 시 1회분 정확 복구에 사용)
-         * clearAutomatically = true 로 1차 캐시 갱신
+     * 특정 냉장고 항목에 수량을 더함 (요리 이력 삭제 시 1회분 정확 복구에 사용).
+     * 트리거 trg_auto_stock_reduce가 차감 시 user_quantity를 비례 차감하므로,
+     * 복원 시에도 동일 비율로 user_quantity를 함께 늘려 일관성을 유지한다.
+     * MariaDB는 SET 절을 좌→우 평가하므로 user_quantity를 quantity보다 먼저 계산해야 한다.
      */
     @Modifying(clearAutomatically = true)
-        @Query(value = "UPDATE My_Fridge SET quantity = quantity + :qty WHERE fridge_item_id = :id",
-                           nativeQuery = true)
+        @Query(value = """
+                       UPDATE My_Fridge
+                       SET
+                           user_quantity = CASE
+                               WHEN quantity > 0
+                                   THEN user_quantity + (:qty * user_quantity / quantity)
+                               ELSE user_quantity + :qty
+                           END,
+                           quantity = quantity + :qty
+                       WHERE fridge_item_id = :id
+                       """, nativeQuery = true)
         void addQuantityToItem(@Param("id") Integer fridgeItemId, @Param("qty") BigDecimal qty);
 
     /**
@@ -42,4 +54,20 @@ public interface MyFridgeRepository extends JpaRepository<MyFridge, Integer> {
                            WHERE ri.recipe_id = :recipeId
                            """, nativeQuery = true)
         void restoreQuantityByRecipeId(@Param("recipeId") Integer recipeId);
+
+    /**
+     * v_fridge_status 뷰를 조회해 사용자 친화적 형태로 반환.
+     * 한글 컬럼명을 영문 alias로 매핑하여 record DTO에 바인딩한다.
+     */
+    @Query(value = """
+                   SELECT
+                       식재료명  AS ingredientName,
+                       보유량    AS userQuantity,
+                       단위      AS userUnit,
+                       보관방법  AS storageType,
+                       유통기한  AS expireDate,
+                       잔여일수  AS daysLeft
+                   FROM v_fridge_status
+                   """, nativeQuery = true)
+    List<FridgeStatusResponse> findFridgeStatus();
 }
