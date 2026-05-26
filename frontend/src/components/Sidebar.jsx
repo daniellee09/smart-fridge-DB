@@ -23,8 +23,8 @@ function Logo() {
         <div className="flex items-center gap-2.5">
             <FridgeIcon />
             <span style={{ fontFamily: "'Pretendard', sans-serif" }} className="text-[15px] tracking-tight leading-none">
-                <span style={{ fontWeight: 700 }} className="text-gray-900">냉장고</span>
-                <span style={{ fontWeight: 700 }} className="text-[#1d4ed8]">지킴이</span>
+                <span style={{ fontWeight: 700 }} className="text-gray-900">스마트</span>
+                <span style={{ fontWeight: 700 }} className="text-[#1d4ed8]">냉장고</span>
             </span>
         </div>
     );

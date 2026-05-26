@@ -13,7 +13,7 @@ BEGIN
     JOIN Category c ON im.category_id = c.category_id
     WHERE im.ingredient_id = NEW.ingredient_id;
 
-    SET NEW.expire_date = DATE_ADD(CURRENT_DATE, INTERVAL v_days DAY);
+    SET NEW.expire_date = DATE_ADD(NEW.add_date, INTERVAL v_days DAY);
 END$$
 
 DELIMITER ;
