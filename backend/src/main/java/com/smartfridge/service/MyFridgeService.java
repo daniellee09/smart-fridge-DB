@@ -1,7 +1,9 @@
 package com.smartfridge.service;
 
+import com.smartfridge.dto.FridgeStatusResponse;
 import com.smartfridge.dto.MyFridgeCreateRequest;
 import com.smartfridge.dto.MyFridgeResponse;
+import com.smartfridge.dto.MyFridgeUpdateRequest;
 import com.smartfridge.entity.IngredientMaster;
 import com.smartfridge.entity.MyFridge;
 import com.smartfridge.repository.IngredientMasterRepository;
@@ -13,6 +15,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import java.math.BigDecimal;
 import java.util.List;
+import java.util.NoSuchElementException;
 
 @Service
 @RequiredArgsConstructor
@@ -31,10 +34,16 @@ public class MyFridgeService {
                 .toList();
     }
 
+    @Transactional(readOnly = true)
+    public List<FridgeStatusResponse> getStatus() {
+        return myFridgeRepository.findFridgeStatus();
+    }
+
     @Transactional
     public MyFridgeResponse add(MyFridgeCreateRequest req) {
         IngredientMaster ingredient = ingredientRepository.findById(req.ingredientId())
-                .orElseThrow(() -> new RuntimeException("식재료를 찾을 수 없습니다."));
+                .orElseThrow(() -> new NoSuchElementException(
+                        "식재료를 찾을 수 없습니다. id=" + req.ingredientId()));
 
         // 단위 환산
         BigDecimal convertToBase = unitConversionRepository
@@ -59,6 +68,22 @@ public class MyFridgeService {
         em.flush();
         em.refresh(item);
 
+        return MyFridgeResponse.from(item);
+    }
+
+    @Transactional
+    public MyFridgeResponse update(Integer id, MyFridgeUpdateRequest req) {
+        MyFridge item = myFridgeRepository.findById(id)
+                .orElseThrow(() -> new NoSuchElementException(
+                        "냉장고 항목을 찾을 수 없습니다. id=" + id));
+
+        BigDecimal convertToBase = unitConversionRepository
+                .findByIngredientIdAndUserUnit(item.getIngredient().getId(), req.userUnit())
+                .map(uc -> uc.getConvertToBase())
+                .orElse(BigDecimal.ONE);
+        BigDecimal quantity = req.userQuantity().multiply(convertToBase);
+
+        item.updateUserDetail(quantity, req.userUnit(), req.userQuantity(), req.storageType());
         return MyFridgeResponse.from(item);
     }
 

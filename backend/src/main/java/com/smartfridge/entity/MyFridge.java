@@ -52,4 +52,12 @@ public class MyFridge {
         this.storageType = storageType;
         this.addDate = addDate;
     }
+
+    public void updateUserDetail(BigDecimal quantity, String userUnit,
+                                  BigDecimal userQuantity, String storageType) {
+        this.quantity = quantity;
+        this.userUnit = userUnit;
+        this.userQuantity = userQuantity;
+        this.storageType = storageType;
+    }
 }

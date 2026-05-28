@@ -5,10 +5,11 @@ CREATE DATABASE IF NOT EXISTS smart_fridge
 USE smart_fridge;
 
 CREATE TABLE Category (
-    category_id   INT AUTO_INCREMENT PRIMARY KEY,
-    category_name VARCHAR(50)  NOT NULL,
-    parent_id     INT          NULL,
-    default_days  INT          DEFAULT 7,
+    category_id          INT         AUTO_INCREMENT PRIMARY KEY,
+    category_name        VARCHAR(50) NOT NULL,
+    parent_id            INT         NULL,
+    default_days         INT         DEFAULT 7,
+    default_storage_type VARCHAR(10) NOT NULL DEFAULT '냉장',
     FOREIGN KEY (parent_id) REFERENCES Category(category_id)
 );
 

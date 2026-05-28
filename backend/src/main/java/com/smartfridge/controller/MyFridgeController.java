@@ -1,8 +1,10 @@
 package com.smartfridge.controller;
 
 import com.smartfridge.common.ApiResponse;
+import com.smartfridge.dto.FridgeStatusResponse;
 import com.smartfridge.dto.MyFridgeCreateRequest;
 import com.smartfridge.dto.MyFridgeResponse;
+import com.smartfridge.dto.MyFridgeUpdateRequest;
 import com.smartfridge.service.MyFridgeService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -21,10 +23,22 @@ import java.util.List;
                         return ApiResponse.ok(myFridgeService.getAll());
             }
 
+    @GetMapping("/status")
+            public ApiResponse<List<FridgeStatusResponse>> getStatus() {
+                        return ApiResponse.ok(myFridgeService.getStatus());
+            }
+
     @PostMapping
             public ApiResponse<MyFridgeResponse> add(
                             @Valid @RequestBody MyFridgeCreateRequest request) {
                         return ApiResponse.ok(myFridgeService.add(request));
+            }
+
+    @PutMapping("/{id}")
+            public ApiResponse<MyFridgeResponse> update(
+                            @PathVariable Integer id,
+                            @Valid @RequestBody MyFridgeUpdateRequest request) {
+                        return ApiResponse.ok(myFridgeService.update(id, request));
             }
 
     @DeleteMapping("/{id}")

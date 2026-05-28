@@ -53,16 +53,10 @@ import java.util.NoSuchElementException;
             }
 
     /**
-     * 요리 이력 1건 삭제 + 재고 복구
-         *
-         * [수정] 기존 restoreQuantityByRecipeId()는 동일 레시피를 N번 조리한 경우
-         * 현재 냉장고에 존재하는 모든 행에 required_qty를 더하므로 N배 과복구됩니다.
-         * 수정된 로직은 RecipeIngredient를 직접 순회하여 재료별로 정확히 1회분만 복구합니다.
-         *   - 냉장고에 해당 재료가 존재하면 required_qty 만큼 수량 증가
-         *   - 트리거가 소진 후 삭제한 재료는 신규 삽입 (단, 기존 storage_type 정보가 없어
-                                             *     "냉장" 기본값으로 복원되는 한계는 이력 테이블에 storage_type 컬럼을 추가해야
-                                             *     완전히 해결됩니다 — TODO 참고)
-                                             */
+     * 요리 이력 1건 삭제 + 재고 복구.
+     * 트리거가 소진 후 삭제한 재료는 Category.default_storage_type을 사용해 신규 삽입한다.
+     * (사용자가 등록 시 선택했던 정확한 storage_type까지 복원하려면 별도 이력 테이블이 필요)
+     */
     @Transactional
             public void deleteHistory(Integer historyId) {
                         CookHistory history = cookHistoryRepository.findById(historyId)
@@ -82,14 +76,15 @@ import java.util.NoSuchElementException;
                                                     // 수량이 가장 적은(먼저 소진될) 항목에 복구
                                     myFridgeRepository.addQuantityToItem(existing.get(0).getId(), ri.getRequiredQty());
                                 } else {
-                                                    // TODO: Cook_History에 storage_type 컬럼 추가 후 원래 값으로 복원 필요
-                                    // 현재는 냉장/required_qty 기본값으로 재삽입 (유통기한도 오늘 기준 재계산됨)
+                                    String storageType = ri.getIngredient().getCategory() != null
+                                            ? ri.getIngredient().getCategory().getDefaultStorageType()
+                                            : "냉장";
                                     myFridgeRepository.save(new MyFridge(
                                                                 ri.getIngredient(),
                                                                 ri.getRequiredQty(),
                                                                 ri.getUnit(),
                                                                 ri.getRequiredQty(),
-                                                                "냉장",
+                                                                storageType,
                                                                 LocalDate.now()
                                                         ));
                                 }
