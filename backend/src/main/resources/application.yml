@@ -1,6 +1,9 @@
 spring:
   profiles:
     active: local
+  main:
+    lazy-initialization: true
+
 
   datasource:
     url: ${DB_URL}
@@ -15,11 +18,15 @@ spring:
     show-sql: true
     properties:
       hibernate:
+        naming:
+          physical-strategy: org.hibernate.boot.model.naming.PhysicalNamingStrategyStandardImpl
         format_sql: true
         dialect: org.hibernate.dialect.MariaDBDialect
 
 server:
   port: 8080
+
+
 
 # 실제 DB 접속 정보는 application-local.yml에 작성하세요.
 # docs/application-local.example.yml을 참고하여 생성합니다.
