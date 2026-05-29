@@ -49,6 +49,7 @@ import java.util.stream.Collectors;
     @ExceptionHandler(Exception.class)
         @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
         public ApiResponse<Void> handleGeneral(Exception ex) {
+            ex.printStackTrace();
                   return ApiResponse.error("서버 내부 오류가 발생했습니다.");
         }
   }
