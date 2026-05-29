@@ -5,6 +5,7 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.servlet.resource.NoResourceFoundException;
 
 import java.util.NoSuchElementException;
 import java.util.stream.Collectors;
@@ -43,6 +44,13 @@ import java.util.stream.Collectors;
         @ResponseStatus(HttpStatus.BAD_REQUEST)
         public ApiResponse<Void> handleIllegalArgument(IllegalArgumentException ex) {
                   return ApiResponse.error(ex.getMessage());
+        }
+
+    /** 매핑된 핸들러·정적 리소스가 없는 경로 (예: /, /favicon.ico) — 404 */
+    @ExceptionHandler(NoResourceFoundException.class)
+        @ResponseStatus(HttpStatus.NOT_FOUND)
+        public ApiResponse<Void> handleNoResource(NoResourceFoundException ex) {
+                  return ApiResponse.error("요청하신 경로를 찾을 수 없습니다.");
         }
 
     /** 그 외 처리되지 않은 예외 — 500 */
