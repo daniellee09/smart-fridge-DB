@@ -68,6 +68,8 @@ import java.util.NoSuchElementException;
                                     recipeIngredientRepository.findByRecipeIdWithIngredient(recipeId);
 
                 for (RecipeIngredient ri : ingredients) {
+                                // orphan FK(Ingredient_Master에 매칭 없는 ingredient_id) 행은 복구 대상에서 제외
+                                if (ri.getIngredient() == null) continue;
                                 Integer ingredientId = ri.getIngredient().getId();
 
                             // 냉장고에 해당 재료가 있으면 정확히 1회분(required_qty)만 복구
