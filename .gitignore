@@ -41,6 +41,11 @@ application-secret.properties
 logs/
 Thumbs.db
 
+# 수동 API 호출 응답 캐시 (개발 중 임시)
+.diag_*.json
+.reg_*.json
+.test_*.json
+
 # Personal work log (not for team sharing)
 WORKLOG.md
 
