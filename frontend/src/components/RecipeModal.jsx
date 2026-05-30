@@ -52,6 +52,14 @@ export function RecipeModal({ isOpen, onClose, ingredient, onCook }) {
 
     if (!isOpen) return null;
 
+    // selectedRecipe(레시피 상세)의 필수 재료 보유 여부 — 부족하면 요리 완료 버튼 비활성화
+    const essentialIngredients = selectedRecipe?.ingredients?.filter((i) => i.essential) ?? [];
+    const canCook = essentialIngredients.length > 0 &&
+        essentialIngredients.every((i) => Number(i.fridgeQty) >= Number(i.requiredQty));
+    const missingEssentials = essentialIngredients.filter(
+        (i) => Number(i.fridgeQty) < Number(i.requiredQty)
+    );
+
     const makeable = recipes.filter(r => r.canMake);
     const notMakeable = recipes.filter(r => !r.canMake);
     const displayList = makeable.length > 0 ? makeable : notMakeable.slice(0, 4);
@@ -131,13 +139,29 @@ export function RecipeModal({ isOpen, onClose, ingredient, onCook }) {
                                 </div>
                             </div>
 
-                            <button
-                                onClick={() => setShowCookConfirm(true)}
-                                className="mt-8 w-full py-3 bg-green-500 hover:bg-green-600 text-white font-semibold rounded-xl transition-colors flex items-center justify-center gap-2"
-                            >
-                                <ChefHat className="w-5 h-5" />
-                                요리 완료
-                            </button>
+                            {canCook ? (
+                                <button
+                                    onClick={() => setShowCookConfirm(true)}
+                                    className="mt-8 w-full py-3 bg-green-500 hover:bg-green-600 text-white font-semibold rounded-xl transition-colors flex items-center justify-center gap-2"
+                                >
+                                    <ChefHat className="w-5 h-5" />
+                                    요리 완료
+                                </button>
+                            ) : (
+                                <div className="mt-8">
+                                    <button
+                                        disabled
+                                        className="w-full py-3 bg-gray-100 text-gray-400 font-semibold rounded-xl cursor-not-allowed"
+                                    >
+                                        요리 완료 (재료 부족)
+                                    </button>
+                                    {missingEssentials.length > 0 && (
+                                        <p className="text-xs text-red-500 mt-2 text-center">
+                                            부족: {missingEssentials.map((i) => `${i.ingredientName} (필요 ${i.requiredQty}${i.unit}, 보유 ${i.fridgeQty}${i.unit})`).join(', ')}
+                                        </p>
+                                    )}
+                                </div>
+                            )}
                         </div>
 
                     ) : displayList.length === 0 ? (
