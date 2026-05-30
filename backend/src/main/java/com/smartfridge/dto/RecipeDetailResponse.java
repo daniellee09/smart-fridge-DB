@@ -22,6 +22,7 @@ public record RecipeDetailResponse(
                 r.getEstimatedTime(),
                 r.getDescription(),
                 r.getIngredients().stream()
+                        .filter(ri -> ri.getIngredient() != null)   // orphan FK 행 제외
                         .map(ri -> RecipeIngredientResponse.from(ri,
                                 fridgeByIngredientId.getOrDefault(ri.getIngredient().getId(), BigDecimal.ZERO)))
                         .toList()
