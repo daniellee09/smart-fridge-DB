@@ -9,8 +9,13 @@ public class WebConfig implements WebMvcConfigurer {
 
     @Override
     public void addCorsMappings(CorsRegistry registry) {
+        // Spring 6에서 allowedOrigins는 와일드카드 불가 → allowedOriginPatterns 사용.
+        // *.vercel.app은 production + preview 배포 도메인을 모두 커버.
         registry.addMapping("/api/**")
-                .allowedOrigins("http://localhost:3000")
+                .allowedOriginPatterns(
+                        "http://localhost:3000",
+                        "https://*.vercel.app"
+                )
                 .allowedMethods("GET", "POST", "PUT", "DELETE", "PATCH")
                 .allowedHeaders("*");
     }
