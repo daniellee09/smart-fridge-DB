@@ -10,6 +10,14 @@ const difficultyBadge = {
     hard: 'bg-red-50 text-red-600',
 };
 
+// 필수 재료의 보유량 대비 색상 — 레시피 탭(RecipeDetailModal)과 동일 기준
+const getIngredientStyle = (ing) => {
+    if (!ing.essential) return 'bg-gray-100 text-gray-600';
+    if (Number(ing.fridgeQty) >= Number(ing.requiredQty)) return 'bg-green-50 text-green-700 font-medium';
+    if (Number(ing.fridgeQty) > 0) return 'bg-amber-50 text-amber-700 font-medium';
+    return 'bg-red-50 text-red-600 font-medium';
+};
+
 export function RecipeModal({ isOpen, onClose, ingredient, onCook }) {
     const [recipes, setRecipes] = useState([]);
     const [selectedRecipe, setSelectedRecipe] = useState(null);
@@ -121,16 +129,21 @@ export function RecipeModal({ isOpen, onClose, ingredient, onCook }) {
                                     <h4 className="text-sm font-semibold text-gray-500 uppercase tracking-wide mb-3">필요한 재료</h4>
                                     <div className="flex flex-wrap gap-2">
                                         {selectedRecipe.ingredients.map((ing) => (
-                                            <span key={ing.ingredientId} className={`px-3 py-1.5 rounded-xl text-sm ${
-                                                ing.essential
-                                                    ? 'bg-toss-blue/10 text-toss-blue font-medium'
-                                                    : 'bg-gray-100 text-gray-600'
-                                            }`}>
-                                                {ing.ingredientName} {ing.requiredQty}{ing.unit}{ing.essential && ' *'}
+                                            <span key={ing.ingredientId} className={`px-3 py-1.5 rounded-xl text-sm ${getIngredientStyle(ing)}`}>
+                                                {ing.ingredientName} {ing.requiredQty}{ing.unit}
+                                                {ing.essential && (
+                                                    <span className="ml-1 opacity-70 text-xs">
+                                                        (보유 {ing.fridgeQty}{ing.unit})
+                                                    </span>
+                                                )}
                                             </span>
                                         ))}
                                     </div>
-                                    <p className="text-xs text-gray-400 mt-2">* 필수 재료</p>
+                                    <p className="text-xs text-gray-400 mt-2">
+                                        필수 재료: <span className="text-green-600">■</span> 충분&nbsp;
+                                        <span className="text-amber-500">■</span> 부족&nbsp;
+                                        <span className="text-red-500">■</span> 없음
+                                    </p>
                                 </div>
 
                                 <div>

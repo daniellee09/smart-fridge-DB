@@ -11,7 +11,7 @@ const DIFFICULTY_OPTIONS = [
     { label: '어려움', value: 'hard' },
 ];
 
-export default function RecipesPage() {
+export default function RecipesPage({ onCook }) {
     const [recipes, setRecipes] = useState([]);
     const [selectedDifficulty, setSelectedDifficulty] = useState('전체');
     const [keyword, setKeyword] = useState('');
@@ -41,6 +41,7 @@ export default function RecipesPage() {
     const handleCook = () => {
         setRefreshKey((k) => k + 1);
         setSelectedRecipe(null);
+        onCook?.(); // App의 냉장고 재고도 함께 갱신 → 냉장고 탭에 즉시 반영
     };
 
     const filtered = recipes.filter((r) => {
