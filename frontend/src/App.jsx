@@ -60,7 +60,7 @@ export default function App() {
                                 />
                             }
                         />
-                        <Route path="/recipes" element={<RecipesPage />} />
+                        <Route path="/recipes" element={<RecipesPage onCook={handleCook} />} />
                         <Route path="/history" element={<HistoryPage />} />
                         <Route path="*" element={<Navigate to="/fridge" replace />} />
                     </Routes>
