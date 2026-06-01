@@ -29,7 +29,7 @@ function avatarColor(name) {
     return AVATAR_COLORS[code % AVATAR_COLORS.length];
 }
 
-export default function HistoryPage() {
+export default function HistoryPage({ onRestore }) {
     const [history, setHistory] = useState([]);
     const [deleteTargetId, setDeleteTargetId] = useState(null);
 
@@ -48,6 +48,7 @@ export default function HistoryPage() {
             await deleteCookHistory(deleteTargetId);
             setDeleteTargetId(null);
             loadHistory();
+            onRestore?.(); // 삭제 시 복구된 냉장고 재고를 App 상태에도 즉시 반영
         } catch (err) {
             console.error('요리 이력 삭제 실패:', err);
             setDeleteTargetId(null);
